@@ -1,0 +1,17 @@
+---
+- name: Set vars for instance_index, instance_sequence
+  set_fact:
+    instance_index: "{{ ansible_play_hosts_all.index(inventory_hostname) }}"
+    instance_sequence: "{{ ansible_play_hosts_all.index(inventory_hostname) + 1 }}"
+
+- name: Print instance_index, instance_sequence
+  debug:
+    msg: "{{ ansible_fqdn }}, {{ instance_index }}, {{ instance_sequence }}"
+
+- name: Generate processes json
+  template:
+    src: processes.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ processes_element_json }}"
+    owner: root
+    group: root
+    mode: '0755'

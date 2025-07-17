@@ -1,0 +1,63 @@
+---
+- name: Get One Organization by id
+  uri:
+    url: "{{ ops_mgr_api_endpoint_get_one_org }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: [200, 404]
+    validate_certs: false
+  register: get_one_organization_response
+
+- name: Print get_one_organization_response
+  debug:
+    var: get_one_organization_response
+
+- name: Sets of operations for creating one project
+  block:
+    - name: Find One Project by Name
+      uri:
+        url: "{{ ops_mgr_api_endpoint_groups_byName }}"
+        user: "{{ global_owner_public_key }}"
+        password: "{{ global_owner_private_key }}"
+        method: GET
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        status_code: [ 200, 404 ]
+        validate_certs: false
+      register: find_one_project_by_name_response
+
+    - name: Print find_one_project_by_name_response
+      debug:
+        var: find_one_project_by_name_response
+
+    - name: Sets of operations for creating a new project
+      block:
+        - name: Create One Project
+          uri:
+            url: "{{ ops_mgr_api_endpoint_groups }}"
+            user: "{{ global_owner_public_key }}"
+            password: "{{ global_owner_private_key }}"
+            method: POST
+            headers:
+              Accept: "application/json"
+              Content-Type: "application/json"
+            body_format: json
+            body: |
+              {
+                "name": "{{ project_name }}",
+                "orgId": "{{ organization_id }}"
+              }
+            status_code: 201
+            validate_certs: false
+          register: create_one_project_response
+
+        - name: Print create_one_project_response
+          debug:
+            msg: "{{ create_one_project_response }}"
+      when: find_one_project_by_name_response.status == 404
+  when: get_one_organization_response.status == 200

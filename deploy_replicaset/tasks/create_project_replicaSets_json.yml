@@ -1,0 +1,36 @@
+---
+- name: Generate replicaSets.members json
+  template:
+    src: replicaSets.members.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/replicaSets_members_{{ index + 1 }}.json"
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ groups['replica-set-cluster'] }}"
+  loop_control:
+    index_var: index
+
+- name: Generate replicaSets json
+  template:
+    src: replicaSets.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/replicaSets.json"
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Merged into replicaSets by jq
+  shell: |
+    jq '.members += [inputs]' {{ ops_mgr_api_tmp_path }}/replicaSets.json {{ ops_mgr_api_tmp_path }}/replicaSets_members_*.json \
+    > {{ ops_mgr_api_tmp_path }}/{{ jq_merged_replicaSets }}
+  register: merged_replicaSets_result
+
+- name: Print merged_replicaSets_result
+  debug:
+    var: merged_replicaSets_result
+
+- name: Change ownership for {{ ops_mgr_api_tmp_path }}/{{ jq_merged_replicaSets }}
+  file:
+    path: "{{ ops_mgr_api_tmp_path }}/{{ jq_merged_replicaSets }}"
+    mode: '0755'
+    owner: root
+    group: root

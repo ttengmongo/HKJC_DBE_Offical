@@ -1,0 +1,6 @@
+---
+- import_tasks: test1.yml
+  tags: test1
+
+- import_tasks: test2.yml
+  tags: test2

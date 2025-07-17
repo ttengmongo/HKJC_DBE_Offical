@@ -1,0 +1,23 @@
+---
+- name: Create One Global Access List Entry
+  uri:
+    url: "{{ ops_mgr_api_endpoint_admin_accessList }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: POST
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body_format: json
+    body: |
+      {
+        "cidrBlock": "{{ admin_accessList_param_cidrBlock }}",
+        "description": "{{ admin_accessList_param_description }}"
+      }
+    status_code: [ 200, 400 ]  # 200: Created Successfully, 400: The provided IP address already exists in another global access list entry
+    validate_certs: false
+  register: create_one_global_access_list_entry_response
+
+- name: Print create_one_global_access_list_entry_response
+  debug:
+    var: create_one_global_access_list_entry_response

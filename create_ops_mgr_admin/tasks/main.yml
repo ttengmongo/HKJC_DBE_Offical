@@ -1,0 +1,3 @@
+---
+- import_tasks: create_first_ops_mgr_user.yml
+  tags: create_first_ops_mgr_user

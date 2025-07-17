@@ -1,0 +1,42 @@
+---
+- name: Define remote_host
+  set_fact:
+    remote_host: "{{ groups['sharded-cluster-mongos'][0] }}"
+
+- name: Print vars remote_host
+  debug:
+    msg: '{{ remote_host }}'
+
+- name: Set vars for instance_index, instance_sequence
+  set_fact:
+    instance_index: "{{ ansible_play_hosts_all.index(inventory_hostname) }}"
+    instance_sequence: "{{ ansible_play_hosts_all.index(inventory_hostname) + 1 }}"
+
+- name: Print instance_index, instance_sequence
+  debug:
+    msg: "{{ ansible_fqdn }}, {{ instance_index }}, {{ instance_sequence }}"
+
+- name: Scp {{ replicaSets_shardsvr_element_json }} to the remote nodes
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ ops_mgr_api_tmp_path }}/{{ replicaSets_shardsvr_element_json }} {{ scp_source_user }}@{{ remote_host }}:{{ ops_mgr_api_tmp_path }}/
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  when: inventory_hostname in (groups.keys() | select("match", "sharded-cluster-shard-\\d+") | map("extract", groups) | flatten | unique)
+  args:
+    executable: /usr/bin/expect
+
+
+- name: Scp {{ replicaSets_configsvr_element_json }} to the remote nodes
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ ops_mgr_api_tmp_path }}/{{ replicaSets_configsvr_element_json }} {{ scp_source_user }}@{{ remote_host }}:{{ ops_mgr_api_tmp_path }}/
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  when: inventory_hostname in groups['sharded-cluster-config-server']
+  args:
+    executable: /usr/bin/expect

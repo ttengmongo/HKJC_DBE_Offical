@@ -1,0 +1,27 @@
+---
+- name: Display contents of automationConfig.json
+  command: "cat {{ binary_path}}automationConfig_updated.json"
+  register: automationConfig_json
+  changed_when: false
+
+- name: Display automationConfig.json content
+  debug:
+    var: automationConfig_json.stdout_lines[0]
+
+- name: Upload automation status
+  uri:
+    url: "https://{{ansible_fqdn}}:{{ops_manager_port}}/api/public/v1.0/groups/{{ project_id }}/automationConfig?pretty=true"
+    method: PUT
+    validate_certs: false
+    return_content: true
+    user: "{{ auth_username }}"
+    password: "{{ auth_password }}"
+    headers:
+      Accept: "application/json"
+    body: "{{ automationConfig_json.stdout_lines[0] }}"
+    body_format: json
+  register: automationConfig
+
+- name: Display automation status
+  debug:
+    var: automationConfig

@@ -1,0 +1,31 @@
+---
+- name: Define play_groups_list
+  set_fact:
+    play_groups_list: "{{ (ansible_play_hosts_all | difference(groups['ops-mgr-application'])) | map('extract', hostvars, 'play_group_name') | list | unique }}"
+
+- name: Print play_groups_list
+  debug:
+    var: play_groups_list
+
+- name: Print play_groups_list.length
+  debug:
+    var: play_groups_list | length
+
+- name: Define cluster_type
+  set_fact:
+    cluster_type: "sharded-cluster"
+  when: play_groups_list | length > 1
+
+- name: Define cluster_type
+  set_fact:
+    cluster_type: "replica-set-cluster"
+  when: play_groups_list | length == 1
+
+- name: Define cluster_type
+  set_fact:
+    cluster_type: "invalid-cluster"
+  when: play_groups_list | length < 1
+
+- name: Print cluster_type
+  debug:
+    var: cluster_type

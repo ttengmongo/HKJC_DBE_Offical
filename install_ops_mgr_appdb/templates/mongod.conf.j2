@@ -1,0 +1,29 @@
+net:
+  bindIp: {{ mongod_conf_net_bindIp }}
+  port: {{ mongod_conf_net_port }}
+  tls:
+    CAFile: {{ mongod_conf_net_tls_CAFile }}
+    allowConnectionsWithoutCertificates: {{ mongod_conf_net_tls_allowConnectionsWithoutCertificates | lower}}
+    certificateKeyFile: {{ mongod_conf_net_tls_certificateKeyFile }}
+    disabledProtocols: {{ mongod_conf_net_tls_disabledProtocols }}
+    mode: {{ mongod_conf_net_tls_mode }}
+processManagement:
+  fork: {{ mongod_conf_processManagement_fork | lower }}
+security:
+  authorization: {{ mongod_conf_security_authorization }}
+  keyFile: {{ mongod_conf_security_keyFile }}
+  javascriptEnabled: {{ mongod_conf_security_javascriptEnabled | lower }}
+setParameter:
+  authenticationMechanisms: {{ mongod_conf_setParameter_authenticationMechanisms }}
+storage:
+  dbPath: {{ mongod_conf_storage_dbPath }}
+  engine: {{ mongod_conf_storage_engine }}
+  wiredTiger:
+    engineConfig:
+      cacheSizeGB: {{ mongod_conf_storage_wiredTiger_engineConfig_cacheSizeGB }}
+systemLog:
+  destination: {{ mongod_conf_systemLog_destination }}
+  path: {{ mongod_conf_systemLog_path }}
+  logAppend: {{ mongod_conf_systemLog_logAppend | lower }}
+replication:
+  replSetName: {{ mongod_conf_replication_replSetName }}

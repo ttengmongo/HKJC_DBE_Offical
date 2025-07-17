@@ -1,0 +1,8 @@
+---
+- name: Create mongod.conf for AppDB by template
+  template:
+    src: mongod.conf.j2
+    dest: /data/appdb/mongod.conf
+    mode: '0644'
+    owner: mongod
+    group: mongod

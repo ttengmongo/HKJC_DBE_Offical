@@ -1,0 +1,108 @@
+---
+- name: Get One Project by ID
+  uri:
+    url: "{{ ops_mgr_api_endpoint_project }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: [200]
+    validate_certs: false
+  register: get_one_project_by_id_response
+
+- name: Print get_one_project_by_id_response
+  debug:
+    var: get_one_project_by_id_response
+
+- name: Define var orgId
+  set_fact:
+    org_id: "{{ get_one_project_by_id_response.json.orgId }}"
+
+- name: Print org_id
+  debug:
+    var: org_id
+
+- name: Get All API Keys
+  uri:
+    url: "{{ ops_mgr_api_endpoint_org_get_all_apiKeys }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: [200]
+    validate_certs: false
+  register: get_all_api_keys_response
+
+- name: Print get_all_api_keys_response
+  debug:
+    var: get_all_api_keys_response
+
+- name: Write into the file {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_api_tmp_get_all_api_keys_json }}
+  copy:
+    content: "{{ get_all_api_keys_response.json.results }}"
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ ops_mgr_api_tmp_get_all_api_keys_json }}"
+    mode: '0644'
+    owner: root
+    group: root
+  register: write_all_api_keys_result
+
+- name: Print write_all_api_keys_result
+  debug:
+    var: write_all_api_keys_result
+
+- name: Get api_key_id by jq
+  shell: cat {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_api_tmp_get_all_api_keys_json }} | jq '.[] | select(.publicKey == "{{ project_public_key }}") | .id' | tr -d '"'
+  register: org_api_key_id_result
+
+- name: Print org_api_key_id_result
+  debug:
+    var: org_api_key_id_result
+
+- name: Define vars for org_api_key_id
+  set_fact:
+    org_api_key_id: "{{ org_api_key_id_result.stdout }}"
+
+- name: Print org_api_key_id
+  debug:
+    var: org_api_key_id
+
+- name: Define all_host_ip
+  set_fact:
+    all_host_ip: "{{ ansible_play_hosts | map('extract', hostvars, 'ansible_all_ipv4_addresses') | flatten | unique}}"
+
+- name: Print all_host_ip
+  debug:
+    var: all_host_ip
+
+- name: Define param_ipAddress
+  set_fact:
+    param_ipAddress: "{{ (param_ipAddress | default([])) + [{'ipAddress': item}] }}"
+  loop: "{{ all_host_ip }}"
+
+- name: Print param_ipAddress
+  debug:
+    var: param_ipAddress
+
+- name: Create Access List Entries for One Organization API Key
+  uri:
+    url: "{{ ops_mgr_api_endpoint_org_api_key_access_list }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    body_format: json
+    body: |
+      {{ param_ipAddress }}
+    status_code: [ 200, 409 ]
+    validate_certs: false
+  register: create_access_list_response
+
+- name: Print create_access_list_response
+  debug:
+    var: create_access_list_response

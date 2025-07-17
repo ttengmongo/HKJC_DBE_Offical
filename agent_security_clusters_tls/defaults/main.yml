@@ -1,0 +1,14 @@
+## <Replace to Your Project ID>
+project_id: "682c44817d5ae067761a8391"
+
+## <Replace to Your Project API Public Key>
+project_api_public_key: "cvtudfxx"
+
+## <Replace to Your Project API Private Key>
+project_api_private_key: "15ed1328-00b5-48e8-a2c7-e487e1ad164d"
+
+## <Replace to Your Username for scp>
+scp_source_user: "jiacy"
+
+## <Replace to Your Password for scp>
+scp_source_pwd: "123456"

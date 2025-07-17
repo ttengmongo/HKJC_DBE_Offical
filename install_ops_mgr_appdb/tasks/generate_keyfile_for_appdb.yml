@@ -1,0 +1,27 @@
+---
+- name: Generate keyfile for AppDB
+  shell:
+    openssl rand -base64 756 > {{ keyfile_root_path }}{{ appdb_keyfile }}
+  args:
+    chdir: '{{ keyfile_root_path }}'
+  register: generate_appdb_keyfile_result
+
+- name: Print generate_appdb_keyfile_result
+  debug:
+    var: generate_appdb_keyfile_result
+
+- name: Set keyfile permissions
+  file:
+    path: '{{ keyfile_root_path }}{{ appdb_keyfile }}'
+    mode: '0500'
+    owner: mongod
+    group: mongod
+
+- name: Copy filekey to tmp mongodb directory
+  copy:
+    src: '{{ keyfile_root_path }}{{ appdb_keyfile }}'
+    dest: '{{ tmp_mongodb_scp }}/{{ appdb_keyfile }}'
+    remote_src: true
+    mode: '0777'
+    owner: mongod
+    group: mongod

@@ -1,0 +1,8 @@
+---
+- name: Print Test2 defaults test
+  debug:
+    var: defaults_test
+
+- name: Print Test2 vars test
+  debug:
+    var: vars_test

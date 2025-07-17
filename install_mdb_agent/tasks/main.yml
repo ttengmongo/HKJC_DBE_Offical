@@ -1,0 +1,26 @@
+---
+- import_tasks: install_jq.yml
+  tags: install_jq
+
+- import_tasks: pregare_dir.yml
+  tags: pregare_dir
+
+- import_tasks: get_hostname_list.yml
+  tags: get_hostname_list
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: download_mms_automation_agent.yml
+  tags: download_mms_automation_agent
+
+- import_tasks: install_mms_automation_agent.yml
+  tags: install_mms_automation_agent
+
+- import_tasks: modify_automation_agent_config.yml
+  tags: modify_automation_agent_config
+
+- import_tasks: start_mms_automation_agent_service.yml
+  tags: start_mms_automation_agent_service
+
+- import_tasks: active_agent_monitoring.yml
+  tags: active_agent_monitoring
+  when: inventory_hostname == play_hosts[0]

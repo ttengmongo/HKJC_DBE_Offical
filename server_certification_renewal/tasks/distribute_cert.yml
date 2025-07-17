@@ -1,0 +1,40 @@
+---
+- name: Extract private key from server cert pfx
+  become: true
+  command: >
+    openssl pkcs12 -in {{ server_cert_remote_dest }}{{ server_cert_remote_name }} -out serverCertKey.pem -nodes -passin pass:{{ server_cert_pfx_pass }}
+  args:
+    chdir: '{{ server_cert_remote_dest }}'
+  register: extract_key_result
+  changed_when: false
+
+- name: Display extract key result
+  debug:
+    msg: "Extracted private key from server cert pfx: {{ extract_key_result }}"
+
+- name: Extract signed cert from server cert pfx
+  become: true
+  command: >
+    openssl pkcs12 -in {{ server_cert_remote_dest }}{{ server_cert_remote_name }} -clcerts -nokeys -out serverCert.pem -passin pass:{{ server_cert_pfx_pass }}
+
+  args:
+    chdir: '{{ server_cert_remote_dest }}'
+  register: extract_cert_result
+  changed_when: false
+
+- name: Display extract cert result
+  debug:
+    msg: "Extracted signed cert from server cert pfx: {{ extract_cert_result }}"
+
+- name: Merge the private key and signed cert
+  become: true
+  shell:
+    cat {{ server_cert_remote_dest }}serverCertKey.pem {{ server_cert_remote_dest }}serverCert.pem > {{ server_cert_remote_dest }}newServerCert.pem
+  args:
+    chdir: '{{ server_cert_remote_dest }}'
+  register: merge_result
+  changed_when: false
+
+- name: Display merge result
+  debug:
+    msg: "Merged private key and signed cert: {{ merge_result }}"

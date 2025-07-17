@@ -1,0 +1,43 @@
+---
+- name: Create One Agent API Key
+  uri:
+    url: "{{ ops_mgr_api_endpoint_agentapikeys }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    body_format: json
+    body: |
+      {
+        "desc": "{{ agentapikeys_param_desc }}"
+      }
+    status_code: 201
+    validate_certs: false
+  register: create_agent_api_key_response
+
+- name: Print create_agent_api_key_response
+  debug:
+    var: create_agent_api_key_response
+
+- name: Define agent_api_key
+  set_fact:
+    agent_api_key: "{{ create_agent_api_key_response.json.key }}"
+
+- name: Print agent_api_key
+  debug:
+    var: agent_api_key
+
+- name: Write project_id, agent_api_key into the file {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_agent_api_key_json }}
+  copy:
+    content: '{"project_id": "{{ project_id }}", "agent_api_key": "{{ agent_api_key }}"}'
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ ops_mgr_agent_api_key_json }}"
+    mode: '0644'
+    owner: root
+    group: root
+  register: write_into_file_result
+
+- name: Print write_into_file_result
+  debug:
+    var: write_into_file_result

@@ -1,0 +1,19 @@
+# tasks/backup.yml
+---
+- name: Create backup directory
+  file:
+    path: '{{ backup_path }}'
+    state: directory
+    mode: "0655"
+  register: backup_dir
+
+- name: Display backup directory
+  debug:
+    msg: "Backup directory: {{ backup_dir }}"
+
+- name: Copy Ops Manager Agent Config file to backup
+  copy:
+    src: /etc/mongodb-mms/automation-agent.config
+    dest: '{{ backup_path }}'
+    remote_src: yes
+    mode: "0655"

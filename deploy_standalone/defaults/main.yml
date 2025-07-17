@@ -1,0 +1,17 @@
+## <Replace to Your Project ID>
+project_id: "682ecaed7d5ae0677620f813"
+
+## <Replace to Your Project API Public Key>
+project_api_public_key: "czalvmiv"
+
+## <Replace to Your Project API Private Key>
+project_api_private_key: "04a408ef-344b-457e-ad70-5d1fb30a9fb3"
+
+## <Replace to Your Cluster Name, and don't be duplicated in the same project>
+cluster_name: "standalone-cluster"
+
+## <Replace to Your Username for scp>
+scp_source_user: "jiacy"
+
+## <Replace to Your Password for scp>
+scp_source_pwd: "123456"

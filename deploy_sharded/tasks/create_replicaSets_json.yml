@@ -1,0 +1,75 @@
+---
+- name: Set var filtered_shard_groups
+  set_fact:
+    filtered_shard_groups: "{{ groups.keys() | select('match', '^sharded-cluster-shard-\\d+$') }}"
+
+- name: Print filtered_shard_groups
+  debug:
+    var: filtered_shard_groups
+
+- name: Set var num_of_shards
+  set_fact:
+    num_of_shards: "{{ filtered_shard_groups | map('regex_replace', '^.*?(\\d+)$', '\\1') | map('int') | max + 1}}"
+
+- name: Print var num_of_shards
+  debug:
+    var: num_of_shards
+
+- name: Generate replicaSets_shardsvr json
+  template:
+    src: replicaSets_shardsvr.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}.json"
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ range(num_of_shards | int) | list }}"
+  loop_control:
+    index_var: index
+
+- name: Generate replicaSets_configsvr json
+  template:
+    src: replicaSets_configsvr.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/replicaSets_configsvr.json"
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Merged into replicaSets_shardsvr by jq
+  shell: |
+    jq '.members += [inputs]' {{ ops_mgr_api_tmp_path }}/replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}.json {{ ops_mgr_api_tmp_path }}/replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}_*.json \
+    > {{ ops_mgr_api_tmp_path }}/merged_replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}.json
+  register: merged_replicaSets_shardsvr_result
+  loop: "{{ range(num_of_shards | int) | list }}"
+  loop_control:
+    index_var: index
+
+- name: Print merged_replicaSets_shardsvr_result
+  debug:
+    var: merged_replicaSets_shardsvr_result
+
+- name: Merged into replicaSets_configsvr by jq
+  shell: |
+    jq '.members += [inputs]' {{ ops_mgr_api_tmp_path }}/replicaSets_configsvr.json {{ ops_mgr_api_tmp_path }}/replicaSets_configsvr_*.json \
+    > {{ ops_mgr_api_tmp_path }}/merged_replicaSets_configsvr.json
+  register: merged_replicaSets_configsvr_result
+
+- name: Print merged_replicaSets_configsvr_result
+  debug:
+    var: merged_replicaSets_configsvr_result
+
+- name: Change ownership for {{ ops_mgr_api_tmp_path }}/merged_replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}.json
+  file:
+    path: "{{ ops_mgr_api_tmp_path }}/merged_replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}.json"
+    mode: '0755'
+    owner: root
+    group: root
+  loop: "{{ range(num_of_shards | int) | list }}"
+  loop_control:
+    index_var: index
+
+- name: Change ownership for {{ ops_mgr_api_tmp_path }}/merged_replicaSets_configsvr.json
+  file:
+    path: "{{ ops_mgr_api_tmp_path }}/merged_replicaSets_configsvr.json"
+    mode: '0755'
+    owner: root
+    group: root

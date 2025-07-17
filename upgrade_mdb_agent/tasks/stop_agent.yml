@@ -1,0 +1,11 @@
+# tasks/stop_agent.yml
+---
+- name: Stop Ops Manager Agent
+  systemd:
+    name: mongodb-mms-automation-agent
+    state: stopped
+  register: stop_result
+
+- name: Display mongodb-mms-automation-agent stop result
+  debug:
+    msg: "Stop result: {{ stop_result }}"

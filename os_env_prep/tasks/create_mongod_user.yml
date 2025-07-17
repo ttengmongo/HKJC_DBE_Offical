@@ -1,0 +1,23 @@
+---
+- name: Create mongod group
+  group:
+    name: mongod
+    gid: 888
+  register: mongod_group
+
+- name: Display mongod group result
+  debug:
+    msg: "mongod group created with GID {{ mongod_group.gid }}"
+
+- name: Create mongod user
+  user:
+    name: mongod
+    comment: "mongod"
+    uid: 888
+    group: mongod
+    shell: /usr/sbin/nologin
+  register: mongod_user
+
+- name: Display mongod user result
+  debug:
+    msg: "mongod user created with UID {{ mongod_user.uid }}"

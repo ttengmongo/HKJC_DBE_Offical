@@ -1,0 +1,45 @@
+# tasks/backup.yml
+---
+- name: Delete existing backup directories
+  file:
+    path: "{{ backup_path }}"
+    state: absent
+
+- name: Create backup directory
+  file:
+    path: '{{ backup_path }}'
+    state: directory
+    mode: "0655"
+  register: backup_dir
+
+- name: Display backup directory
+  debug:
+    msg: "Backup directory: {{ backup_dir }}"
+
+- name: Copy AppDB directory to backup
+  copy:
+    src: '{{ app_db_path }}'
+    dest: '{{ backup_path }}'
+    remote_src: yes
+    mode: "0655"
+
+- name: Copy AppDB mongod.conf to backup
+  copy:
+    src: /etc/mongod.conf
+    dest: '{{ backup_path }}'
+    remote_src: yes
+    mode: "0644"
+
+#- name: Copy BlockstoreDB directory to backup
+#  copy:
+#    src: /data/blockstore/
+#    dest: '{{ backup_path }}blockstoreBackup'
+#    remote_src: yes
+#    mode: "0644"
+#
+#- name: Copy BlockstoreDB mongod.conf to backup
+#  copy:
+#    src: /data/blockstore/mongod.conf
+#    dest: '{{ backup_path }}blockstoreBackup'
+#    remote_src: yes
+#    mode: "0644"

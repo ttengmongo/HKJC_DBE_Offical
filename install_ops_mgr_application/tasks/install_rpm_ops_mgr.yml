@@ -1,0 +1,10 @@
+---
+- name: Install Ops Manager Application RPM package
+  command: rpm -Uvh '{{ install_binary_path }}/{{ ops_mgr_application_rpm }}'
+  register: install_result
+  ignore_errors: true
+  failed_when: false
+
+- name: Print Ops Manager Application Installation Result
+  debug:
+    msg: '{{ install_result }}'

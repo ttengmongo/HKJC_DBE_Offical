@@ -1,0 +1,6 @@
+---
+- import_tasks: fetch_ops_mgr_api_keys.yml
+  tags: fetch_ops_mgr_api_keys
+
+- import_tasks: create_new_global_api_key.yml
+  tags: create_new_global_api_key

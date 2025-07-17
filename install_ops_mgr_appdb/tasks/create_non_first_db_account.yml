@@ -1,0 +1,66 @@
+---
+- name: Create Non-First Other Account {{ other_db_account_1_name }}
+  command: >
+    mongosh 
+      --host {{ appdb_rs_name }}/{{ hostname_list[0] }} 
+      --port {{ appdb_port }} 
+      --tls 
+      --tlsCAFile {{ mdb_cert_root_ca }} 
+      --authenticationDatabase admin 
+      -u {{ first_db_account_name }} 
+      -p {{ first_db_account_pwd }} 
+      --eval 'use admin' 
+      --eval 'db.createUser({{ other_db_account_1 }})'
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Check Login with the New Added Account {{ other_db_account_1_name }}
+  command: >
+    mongosh 
+      --host {{ appdb_rs_name }}/{{ hostname_list[0] }} 
+      --port {{ appdb_port }} 
+      --tls 
+      --tlsCAFile {{ mdb_cert_root_ca }} 
+      --authenticationDatabase admin 
+      -u {{ other_db_account_1_name }} 
+      -p {{ other_db_account_1_pwd }} 
+      --eval '{{ mongosh_cmd_conn_status }}'
+  register: check_login_result
+
+- name: Print check_login_result
+  debug:
+    msg: "{{ check_login_result }}"
+
+- name: Create Non-First Other Account {{ other_db_account_2_name }}
+  command: >
+    mongosh 
+      --host {{ appdb_rs_name }}/{{ hostname_list[0] }} 
+      --port {{ appdb_port }} 
+      --tls 
+      --tlsCAFile {{ mdb_cert_root_ca }} 
+      --authenticationDatabase admin 
+      -u {{ first_db_account_name }} 
+      -p {{ first_db_account_pwd }} 
+      --eval 'use admin' 
+      --eval 'db.createUser({{ other_db_account_2 }})'
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Check Login with the New Added Account {{ other_db_account_1_name }}
+  command: >
+    mongosh 
+      --host {{ appdb_rs_name }}/{{ hostname_list[0] }} 
+      --port {{ appdb_port }} 
+      --tls 
+      --tlsCAFile {{ mdb_cert_root_ca }} 
+      --authenticationDatabase admin 
+      -u {{ other_db_account_2_name }} 
+      -p {{ other_db_account_2_pwd }} 
+      --eval '{{ mongosh_cmd_conn_status }}'
+  register: check_login_result
+
+- name: Print check_login_result
+  debug:
+    msg: "{{ check_login_result }}"

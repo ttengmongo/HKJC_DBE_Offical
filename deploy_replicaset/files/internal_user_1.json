@@ -1,0 +1,13 @@
+{
+    "authenticationRestrictions": [],
+    "db": "admin",
+    "mechanisms": [],
+    "roles": [
+        {
+            "db": "admin",
+            "role": "clusterMonitor"
+        }
+    ],
+    "user": "mms-monitoring-agent",
+    "initPwd": "mms-monitoring-agent-001"
+}

@@ -1,0 +1,15 @@
+---
+- name: Check if mongodb-mms-automation-agent is running
+  systemd:
+    name: mongodb-mms-automation-agent
+    state: started
+  register: agent_status
+
+- name: Display mongodb-mms-automation-agent status
+  debug:
+    msg: "mongodb-mms-automation-agent status is : {{ agent_status.status.ActiveState }} and state time was : {{ agent_status.status.ExecMainStartTimestamp }}"
+
+- name: Verify mongodb-mms-automation-agent is running
+  fail:
+    msg: "mongodb-mms-automation-agent launch is failed"
+  when: agent_status.status.ActiveState == 'failed'

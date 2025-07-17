@@ -1,0 +1,26 @@
+---
+- import_tasks: install_required_package.yml
+  tags: install_required_package
+
+- import_tasks: enable_tuned_service.yml
+  tags: enable_tuned_service
+
+- import_tasks: enable_thp_service.yml
+  tags: enable_thp_service
+
+- import_tasks: os_parameter_config.yml
+  tags: os_parameter_config
+
+- import_tasks: create_mongod_user.yml
+  tags: create_mongod_user
+
+- import_tasks: install_mongosh.yml
+  tags: install_mongosh
+
+- import_tasks: create_mongodb_mms_user.yml
+  tags: create_mongodb_mms_user
+  when: "'ops-mgr-application' in group_names"
+
+- import_tasks: create_encryption_key.yml
+  tags: create_encryption_key
+  when: "'DATA_NODES' in group_names"

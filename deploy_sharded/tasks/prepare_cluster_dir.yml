@@ -1,0 +1,54 @@
+---
+- name: Create dir {{ mms_cluster_path }}
+  file:
+    path: '{{ mms_cluster_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create dir {{ mms_cluster_path }}{{ replica_set_data_path }}
+  file:
+    path: '{{ mms_cluster_path }}{{ replica_set_data_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create dir {{ mms_cluster_path }}{{ replica_set_log_path }}
+  file:
+    path: '{{ mms_cluster_path }}{{ replica_set_log_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create dir {{ ops_mgr_api_tmp_path }}
+  file:
+    path: '{{ ops_mgr_api_tmp_path }}'
+    state: directory
+    mode: '0777'
+    owner: root
+    group: root
+
+- name: Create dir {{ mdb_cluster_keytab_path }}
+  file:
+    path: '{{ mdb_cluster_keytab_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Check if exists {{ mdb_cluster_keytab }}
+  stat:
+    path: "{{ mdb_cluster_keytab }}"
+  register: check_stat_result
+
+- name: Create {{ mdb_cluster_keytab }} if not exists
+  file:
+    path: "{{ mdb_cluster_keytab }}"
+    state: touch
+    mode: '0644'
+    owner: mongod
+    group: mongod
+  when: not check_stat_result.stat.exists

@@ -1,0 +1,5 @@
+---
+- name: Restart Ops Manager automation agent
+  systemd:
+    name: mongodb-mms-automation-agent
+    state: restarted

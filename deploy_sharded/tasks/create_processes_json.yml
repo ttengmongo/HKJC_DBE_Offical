@@ -1,0 +1,36 @@
+---
+- name: Set vars for instance_index, instance_sequence
+  set_fact:
+    instance_index: "{{ ansible_play_hosts_all.index(inventory_hostname) }}"
+    instance_sequence: "{{ ansible_play_hosts_all.index(inventory_hostname) + 1 }}"
+
+- name: Print instance_index, instance_sequence
+  debug:
+    msg: "{{ ansible_fqdn }}, {{ instance_index }}, {{ instance_sequence }}"
+
+- name: Generate processes_shardsvr json
+  template:
+    src: processes_shardsvr.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ processes_shardsvr_element_json }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: inventory_hostname in (groups.keys() | select("match", "sharded-cluster-shard-\\d+") | map("extract", groups) | flatten | unique)
+
+- name: Generate processes_configsvr json
+  template:
+    src: processes_configsvr.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ processes_configsvr_element_json }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: inventory_hostname in groups['sharded-cluster-config-server']
+
+- name: Generate processes_mongos json
+  template:
+    src: processes_mongos.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ processes_mongos_element_json }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: inventory_hostname in groups['sharded-cluster-mongos']

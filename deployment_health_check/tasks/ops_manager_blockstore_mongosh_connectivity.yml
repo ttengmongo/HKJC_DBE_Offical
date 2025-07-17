@@ -1,0 +1,25 @@
+---
+- name: Blocksotre Mongosh connectivity check
+  command:
+    cmd: "mongosh --host {{ ansible_fqdn }} --port {{ blockstore_db_port }} -u {{blkdbadmin_user}} -p {{ blkdbadmin_password }} --tls --tlsCAFile {{ ca_cert_path }} --authenticationDatabase admin --eval '{{ validation_command }}'"
+  register: blockstore_check
+  changed_when: False
+
+- name: Display the Blockstore connectivity check result
+  debug:
+    msg: "Blockstore connectivity check result: {{ blockstore_check.stdout }}"
+
+- name: Verify Blockstore is running
+  fail:
+    msg: "BlockStore DB health check failed. Unable to connect or ping the database."
+  when: blockstore_check.rc != 0
+
+- name: Blockstore DB Version check
+  command:
+    cmd: "mongosh --host {{ ansible_fqdn }} --port {{ blockstore_db_port }} -u {{blkdbadmin_user}} -p {{ blkdbadmin_password  }} --tls --tlsCAFile {{ ca_cert_path }} --authenticationDatabase admin --eval 'db.version()'"
+  register: blockstore_version_check
+  changed_when: False
+
+- name: Display the BlockstoreDB version check result
+  debug:
+    msg: "BlockStore DB version check result: {{ blockstore_version_check.stdout }}"

@@ -1,0 +1,31 @@
+---
+- name: Define scp_source
+  set_fact:
+    scp_source: "{{ groups['ops-mgr-appdb'][0] }}"
+
+- name: Print vars scp_source
+  debug:
+    msg: '{{scp_source}}'
+
+- name: Delete existed AppDB keyfile
+  file:
+    path: '{{ keyfile_root_path }}{{ appdb_keyfile }}'
+    state: absent
+
+- name: Scp AppDB keyfile from remote to local
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ scp_source_user }}@{{ scp_source }}:{{ tmp_mongodb_scp }}/{{ appdb_keyfile }} {{ keyfile_root_path }}{{ appdb_keyfile }}
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  args:
+    executable: /usr/bin/expect
+
+- name: Modify file permission
+  file:
+    path: '{{ keyfile_root_path }}{{ appdb_keyfile }}'
+    mode: '0500'
+    owner: mongod
+    group: mongod

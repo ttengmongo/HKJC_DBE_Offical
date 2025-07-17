@@ -1,0 +1,32 @@
+---
+- name: Create dir {{ mms_cluster_path }}
+  file:
+    path: '{{ mms_cluster_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create dir {{ mms_cluster_path }}{{ replica_set_data_path }}
+  file:
+    path: '{{ mms_cluster_path }}{{ replica_set_data_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create dir {{ mms_cluster_path }}{{ replica_set_log_path }}
+  file:
+    path: '{{ mms_cluster_path }}{{ replica_set_log_path }}'
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create dir {{ ops_mgr_api_tmp_path }}
+  file:
+    path: '{{ ops_mgr_api_tmp_path }}'
+    state: directory
+    mode: '0777'
+    owner: root
+    group: root

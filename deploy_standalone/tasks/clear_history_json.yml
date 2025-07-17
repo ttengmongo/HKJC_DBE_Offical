@@ -1,0 +1,54 @@
+---
+- name: Find {{ ops_mgr_api_tmp_path }}/common_user_*.json
+  find:
+    paths: '{{ ops_mgr_api_tmp_path }}'
+    patterns: "common_user_*.json"
+    use_regex: false
+  register: deleted_common_user_json
+
+- name: Delete existed {{ ops_mgr_api_tmp_path }}/common_user_*.json
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ deleted_common_user_json.files }}"
+
+- name: Find {{ ops_mgr_api_tmp_path }}/internal_user_*.json
+  find:
+    paths: '{{ ops_mgr_api_tmp_path }}'
+    patterns: "internal_user_*.json"
+    use_regex: false
+  register: deleted_internal_user_json
+
+- name: Delete existed {{ ops_mgr_api_tmp_path }}/internal_user_*.json
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ deleted_internal_user_json.files }}"
+
+- name: Find {{ ops_mgr_api_tmp_path }}/processes_*.json
+  find:
+    paths: '{{ ops_mgr_api_tmp_path }}'
+    patterns: "processes_*.json"
+    use_regex: false
+  register: deleted_processes_json
+
+- name: Delete existed {{ ops_mgr_api_tmp_path }}/processes_*.json
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ deleted_processes_json.files }}"
+
+- name: Delete existed {{ ops_mgr_api_tmp_path }}/roles.json
+  file:
+    path: '{{ ops_mgr_api_tmp_path }}/roles.json'
+    state: absent
+
+- name: Delete existed {{ ops_mgr_api_current_automation_config }}
+  file:
+    path: '{{ ops_mgr_api_current_automation_config }}'
+    state: absent
+
+- name: Delete existed {{ ops_mgr_api_updated_automation_config }}
+  file:
+    path: '{{ ops_mgr_api_updated_automation_config }}'
+    state: absent

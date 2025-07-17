@@ -1,0 +1,59 @@
+---
+- name: Get global_owner_public_key by jq from {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}
+  shell: cat {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }} | jq '.global_api_keys.global_owner_api_key.public_key' | tr -d '"'
+  register: global_owner_public_key_result
+
+- name: Get global_owner_private_key by jq from {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}
+  shell: cat {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }} | jq '.global_api_keys.global_owner_api_key.private_key' | tr -d '"'
+  register: global_owner_private_key_result
+
+- name: Define global_owner_public_key, global_owner_private_key
+  set_fact:
+    global_owner_public_key: "{{ global_owner_public_key_result.stdout }}"
+    global_owner_private_key: "{{ global_owner_private_key_result.stdout }}"
+
+- name: Print global_owner_public_key, global_owner_private_key which are read from {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}
+  debug:
+    msg: "global_owner_public_key={{ global_owner_public_key }}, global_owner_private_key={{ global_owner_private_key }}"
+
+- name: Get One Organization by id
+  uri:
+    url: "{{ ops_mgr_api_endpoint_get_one_org }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: [200, 404]
+    validate_certs: false
+  register: get_one_organization_response
+
+- name: Print get_one_organization_response
+  debug:
+    var: get_one_organization_response
+
+- name: Sets of operations for renaming one organization
+  block:
+    - name: Rename One Organization
+      uri:
+        url: "{{ ops_mgr_api_endpoint_get_one_org }}"
+        user: "{{ global_owner_public_key }}"
+        password: "{{ global_owner_private_key }}"
+        method: PATCH
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+        body_format: json
+        body: |
+          {
+            "name": "{{ ops_mgr_organization_name_new }}"
+          }
+        status_code: 200
+        validate_certs: false
+      register: rename_one_organization_response
+
+    - name: Print rename_one_organization_response
+      debug:
+        msg: "{{ rename_one_organization_response }}"
+  when: get_one_organization_response.status == 200

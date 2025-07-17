@@ -1,0 +1,17 @@
+---
+- name: Print global_auth_key
+  debug:
+    msg: "{{ hostvars['localhost'].global_auth_key }}"
+
+- name: Create the file {{ auth_keyfile }}
+  file:
+    path: "{{ auth_keyfile }}"
+    state: touch
+    mode: '0600'
+    owner: mongod
+    group: mongod
+
+- name: Write into the file {{ auth_keyfile }}
+  copy:
+    content: "{{ hostvars['localhost'].global_auth_key }}"
+    dest: "{{ auth_keyfile }}"

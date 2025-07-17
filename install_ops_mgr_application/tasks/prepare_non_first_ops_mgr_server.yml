@@ -1,0 +1,41 @@
+---
+- name: Create dir {{ ops_mgr_api_tmp_path }}
+  file:
+    path: "{{ ops_mgr_api_tmp_path }}"
+    state: directory
+    mode: '0777'
+    owner: root
+    group: root
+
+- name: Scp {{ ops_mgr_global_api_key_json }} from remote to local
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ scp_source_user }}@{{ ops_mgr_app_server }}:{{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }} {{ ops_mgr_api_tmp_path }}/
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  args:
+    executable: /usr/bin/expect
+
+- name: Check if existed {{ ops_mgr_global_api_key_json }}
+  file:
+    path: "{{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}"
+    state: file
+
+- name: Get global_owner_public_key by jq from {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}
+  shell: cat {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }} | jq '.global_api_keys.global_owner_api_key.public_key' | tr -d '"'
+  register: global_owner_public_key_result
+
+- name: Get global_owner_private_key by jq from {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}
+  shell: cat {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }} | jq '.global_api_keys.global_owner_api_key.private_key' | tr -d '"'
+  register: global_owner_private_key_result
+
+- name: Define global_owner_public_key, global_owner_private_key
+  set_fact:
+    global_owner_public_key: "{{ global_owner_public_key_result.stdout }}"
+    global_owner_private_key: "{{ global_owner_private_key_result.stdout }}"
+
+- name: Print global_owner_public_key, global_owner_private_key which are read from {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_global_api_key_json }}
+  debug:
+    msg: "global_owner_public_key={{ global_owner_public_key }}, global_owner_private_key={{ global_owner_private_key }}"

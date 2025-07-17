@@ -1,0 +1,12 @@
+---
+- name: Install required packages
+  zypper:
+    name: '{{ binary_path }}{{ item }}'
+    disable_gpg_check: yes
+    state: present
+  loop: "{{ dependency_packages }}"
+  register: install_result
+
+- name: Display the install result
+  debug:
+    msg: "Install result: {{ install_result }}"

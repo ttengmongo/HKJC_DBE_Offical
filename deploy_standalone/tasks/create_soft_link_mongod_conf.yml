@@ -1,0 +1,7 @@
+---
+- name: Create symlink for agent automatically generated mongod.conf by HKJC Security Standard
+  file:
+    src: "{{ mms_cluster_path }}{{ cluster_data_path }}/{{ agent_mongod_conf }}"
+    path: "{{ mms_cluster_path }}/{{ mongod_conf }}"
+    state: link
+    force: yes

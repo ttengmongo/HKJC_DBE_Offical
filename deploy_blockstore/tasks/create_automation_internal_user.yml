@@ -1,0 +1,240 @@
+---
+- name: Check if existed {{ auth_keyfile }}
+  stat:
+    path: "{{ auth_keyfile }}"
+  register: check_stat_result
+
+- name: Print check_stat_result
+  debug:
+    msg: "{{ check_stat_result }}"
+
+- name: Generate key for auth.key when not existed
+  block:
+    - name: Generate key by shell
+      shell: openssl rand -base64 756
+      register: generate_auth_key_result
+
+    - name: Print generate_auth_key_result
+      debug:
+        msg: "{{ generate_auth_key_result }}"
+
+    - name: Define var auth_key
+      set_fact:
+        auth_key: "{{ generate_auth_key_result.stdout }}"
+  when: not check_stat_result.stat.exists
+
+- name: Read from {{ auth_keyfile }} as auth.key when existed
+  block:
+    - name: Read file from remote node into auth_keyfile_result
+      slurp:
+        src: "{{ auth_keyfile }}"
+      register: auth_keyfile_result
+
+    - name: Print auth_keyfile_result.content
+      debug:
+        msg: "{{ auth_keyfile_result.content | b64decode }}"
+
+    - name: Define var auth_key
+      set_fact:
+        auth_key: "{{ auth_keyfile_result.content | b64decode }}"
+  when: check_stat_result.stat.exists
+
+- name: Print auth_key
+  debug:
+    var: auth_key
+
+- name: Get the Automation Configuration for Creating Internal Users
+  uri:
+    url: "{{ ops_mgr_api_endpoint_automationConfig }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_automation_configuration_response
+
+- name: Print get_automation_configuration_response
+  debug:
+    var: get_automation_configuration_response
+
+- name: Define current_automation_config_json
+  set_fact:
+    current_automation_config_json: "{{ get_automation_configuration_response.json }}"
+
+- name: Print current_automation_config_json
+  debug:
+    var: current_automation_config_json
+
+- name: Write into the file {{ ops_mgr_api_current_automation_config }}
+  copy:
+    content: "{{ current_automation_config_json }}"
+    dest: "{{ ops_mgr_api_current_automation_config }}"
+    mode: '0755'
+    owner: root
+    group: root
+  register: write_current_config_result
+
+- name: Print write_current_config_result
+  debug:
+    var: write_current_config_result
+
+- name: Copy file {{ internal_user_1_json }}
+  copy:
+    src: "{{ internal_user_1_json }}"
+    dest: "{{ ops_mgr_api_tmp_auth_usersWanted_user_1 }}"
+    mode: '0755'
+    owner: root
+    group: root
+  register: copy_internal_user_1_result
+
+- name: Print copy_internal_user_1_result
+  debug:
+    msg: "{{ copy_internal_user_1_result }}"
+
+- name: Copy file {{ internal_user_2_json }}
+  copy:
+    src: "{{ internal_user_2_json }}"
+    dest: "{{ ops_mgr_api_tmp_auth_usersWanted_user_2 }}"
+    mode: '0755'
+    owner: root
+    group: root
+  register: copy_internal_user_2_result
+
+- name: Print copy_internal_user_2_result
+  debug:
+    msg: "{{ copy_internal_user_2_result }}"
+
+- name: Merged internal_user_1 into auth.usersWanted by jq
+  shell: |
+    jq --argfile internal_user_1 {{ ops_mgr_api_tmp_auth_usersWanted_user_1 }} \
+    'del(.auth.usersWanted[] | select(.user == "mms-monitoring-agent")) | .auth.usersWanted += [$internal_user_1]' {{ ops_mgr_api_current_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_internal_user_1_result
+
+- name: Print merged_internal_user_1_result
+  debug:
+    var: merged_internal_user_1_result
+
+- name: Merged internal_user_2 into auth.usersWanted by jq
+  shell: |
+    jq --argfile internal_user_2 {{ ops_mgr_api_tmp_auth_usersWanted_user_2 }} \
+    'del(.auth.usersWanted[] | select(.user == "mms-backup-agent")) | .auth.usersWanted += [$internal_user_2]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_internal_user_2_result
+
+- name: Print merged_internal_user_2_result
+  debug:
+    var: merged_internal_user_2_result
+
+- name: Merged auth.autoUser by jq
+  shell: |
+    cat {{ ops_mgr_api_updated_automation_config }} | jq '{{ jq_cmd_auth_autoUser }}' \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_auth_autoUser_result
+
+- name: Print merged_auth_autoUser_result
+  debug:
+    var: merged_auth_autoUser_result
+
+- name: Merged auth.autoPwd by jq
+  shell: |
+    cat {{ ops_mgr_api_updated_automation_config }} | jq '{{ jq_cmd_auth_autoPwd }}' \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_auth_autoPwd_result
+
+- name: Print merged_auth_autoPwd_result
+  debug:
+    var: merged_auth_autoPwd_result
+
+- name: Merged auth.disabled by jq
+  shell: |
+    cat {{ ops_mgr_api_updated_automation_config }} | jq '{{ jq_cmd_auth_disabled }}' \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_auth_disabled_result
+
+- name: Print merged_auth_disabled_result
+  debug:
+    var: merged_auth_disabled_result
+
+- name: Merged auth.key by jq
+  shell: |
+    cat {{ ops_mgr_api_updated_automation_config }} | jq '{{ jq_cmd_auth_key }}' \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_auth_key_result
+
+- name: Print merged_auth_key_result
+  debug:
+    var: merged_auth_key_result
+
+- name: Merged auth.keyfile by jq
+  shell: |
+    cat {{ ops_mgr_api_updated_automation_config }} | jq '{{ jq_cmd_auth_keyfile }}' \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_auth_keyfile_result
+
+- name: Print merged_auth_keyfile_result
+  debug:
+    var: merged_auth_keyfile_result
+
+- name: Merged auth.keyfileWindows by jq
+  shell: |
+    cat {{ ops_mgr_api_updated_automation_config }} | jq '{{ jq_cmd_auth_keyfileWindows }}' \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  register: merged_auth_keyfileWindows_result
+
+- name: Print merged_auth_keyfileWindows_result
+  debug:
+    var: merged_auth_keyfileWindows_result
+
+- name: Change ownership of {{ ops_mgr_api_updated_automation_config }}
+  file:
+    path: "{{ ops_mgr_api_updated_automation_config }}"
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Read file from remote node into updated_automation_config
+  slurp:
+    src: "{{ ops_mgr_api_updated_automation_config }}"
+  register: updated_automation_config
+
+- name: Print updated_automation_config
+  debug:
+    msg: "{{ updated_automation_config.content | b64decode }}"
+
+- name: Define updated_automation_config_json
+  set_fact:
+    updated_automation_config_json: "{{ updated_automation_config.content | b64decode }}"
+
+- name: Print updated_automation_config_json
+  debug:
+    var: updated_automation_config_json
+
+- name: Update the Automation Configuration for Creating Internal Users
+  uri:
+    url: "{{ ops_mgr_api_endpoint_automationConfig }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: PUT
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body: "{{ updated_automation_config_json | to_json }}"
+    status_code: 200
+    validate_certs: false
+  register: update_automation_configuration_response
+
+- name: Print update_automation_configuration_response
+  debug:
+    var: update_automation_configuration_response

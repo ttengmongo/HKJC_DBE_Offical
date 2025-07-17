@@ -1,0 +1,19 @@
+---
+- import_tasks: copy_updated_mongodb_binary.yml
+  tags: copy_updated_mongodb_binary
+
+- import_tasks: downloadAutomationConfig.yml
+  tags: download_automation_config
+
+- import_tasks: updateAutomationConfig.yml
+  tags: update_automation_config
+
+- import_tasks: uploadAutomationConfig.yml
+  tags: upload_automation_config
+
+- import_tasks: trackingUpdateAutomationConfig.yml
+  tags: tracking_update_automation_config
+
+
+
+

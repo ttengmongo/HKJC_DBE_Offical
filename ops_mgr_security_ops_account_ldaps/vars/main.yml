@@ -1,0 +1,15 @@
+conf_mms_properties: /opt/mongodb/mms/conf/conf-mms.properties
+
+mms_conf: /opt/mongodb/mms/conf/mms.conf
+mms_conf_base_ssl_port: 8132
+
+mms_userSvcClass: UserSvcLdap
+mms_ldap_url: "{{ mms_ldap_url_customized }}"
+mms_ldap_bindDn: "{{ mms_ldap_bindDn_customized }}"
+mms_ldap_bindPassword: "{{ mms_ldap_bindPassword_customized }}"
+mms_ldap_user_baseDn: "{{ mms_ldap_user_baseDn_customized }}"
+mms_ldap_group_baseDn: "{{ mms_ldap_group_baseDn_customized }}"
+mms_ldap_user_searchAttribute: sAMAccountName
+mms_ldap_group_member: member
+mms_ldap_global_role_owner: "{{ mms_ldap_global_role_owner_customized }}"
+mms_ldap_referral: ignore

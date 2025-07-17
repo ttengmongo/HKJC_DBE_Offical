@@ -1,0 +1,117 @@
+---
+- name: Get All Backup Daemon Configurations
+  uri:
+    url: "{{ ops_mgr_api_endpoint_get_all_backup_daemon }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_all_backup_daemon_response
+
+- name: Print get_all_backup_daemon_response
+  debug:
+    var: get_all_backup_daemon_response
+
+- name: Get One Backup Daemon Configurations
+  uri:
+    url: "{{ ops_mgr_api_endpoint_get_one_backup_daemon }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: [200, 404]
+    validate_certs: false
+  register: get_one_backup_daemon_response
+
+- name: Print get_one_backup_daemon_response
+  debug:
+    var: get_one_backup_daemon_response
+
+- name: Config backup daemon when found the backup daemon
+  block:
+    - name: Print the Backup Daemon ID
+      debug:
+        var: get_one_backup_daemon_response.json.id
+
+    - name: Define backup_daemon_id
+      set_fact:
+        backup_daemon_id: "{{ get_one_backup_daemon_response.json.id }}"
+
+    - name: Print backup_daemon_id
+      debug:
+        var: backup_daemon_id
+
+    - name: Update One Backup Daemon Configuration
+      uri:
+        url: "{{ ops_mgr_api_endpoint_update_backup_daemon }}"
+        user: "{{ global_owner_public_key }}"
+        password: "{{ global_owner_private_key }}"
+        method: PUT
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+        body_format: json
+        body: |
+          {
+            "id": "{{ backup_daemon_id }}",
+            "machine": {
+              "headRootDirectory": "{{ ops_mgr_backup_head_dir }}",
+              "machine": "{{ instance_hostname }}"
+            },
+            "assignmentEnabled": true,
+            "backupJobsEnabled": true,
+            "configured": true,
+            "garbageCollectionEnabled": true,
+            "resourceUsageEnabled": true,
+            "restoreQueryableJobsEnabled": true
+          }
+        status_code: 200
+        validate_certs: false
+      register: update_backup_daemon_configuration_response
+
+    - name: Print update_backup_daemon_configuration_response
+      debug:
+        var: update_backup_daemon_configuration_response
+
+    - name: Get All Backup Daemon Configurations
+      uri:
+        url: "{{ ops_mgr_api_endpoint_get_all_backup_daemon }}"
+        user: "{{ global_owner_public_key }}"
+        password: "{{ global_owner_private_key }}"
+        method: GET
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        status_code: 200
+        validate_certs: false
+      register: get_all_backup_daemon_response
+
+    - name: Print get_all_backup_daemon_response
+      debug:
+        var: get_all_backup_daemon_response
+
+    - name: Define is_continue
+      set_fact:
+        is_continue: true
+  when: get_one_backup_daemon_response.status == 200
+
+- name: Print info and set vars when not found the backup daemon
+  block:
+    - name: Print info when not found the backup daemon
+      debug:
+        msg: "The backup daemon might have already been configured"
+
+    - name: Define is_continue
+      set_fact:
+        is_continue: false
+  when: get_one_backup_daemon_response.status == 404
+
+- name: Print is_continue
+  debug:
+    var: is_continue

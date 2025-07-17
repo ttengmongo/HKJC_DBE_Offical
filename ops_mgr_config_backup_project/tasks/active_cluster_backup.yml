@@ -1,0 +1,202 @@
+---
+- name: Get All Clusters in One Project
+  uri:
+    url: "{{ ops_mgr_api_endpoint_clusters_by_project }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_all_clusters_by_project_response
+
+- name: Print get_all_clusters_by_project_response
+  debug:
+    var: get_all_clusters_by_project_response
+
+- name: Print get_all_clusters_by_project_response.json
+  debug:
+    var: get_all_clusters_by_project_response.json
+
+- name: The Cluster Type of {{ cluster_name }} is Sharded Cluster
+  block:
+    - name: find cluster_id by cluster_name by jq
+      shell: |
+        echo '{{ get_all_clusters_by_project_response.json | to_json }}' | jq '.results[] | select(.clusterName == "{{ cluster_name }}" and .typeName == "SHARDED_REPLICA_SET").id'
+      register: find_cluster_id_result
+
+    - name: Define cluster_id
+      set_fact:
+        cluster_id: "{{ find_cluster_id_result.stdout | replace('\"', '') }}"
+
+    - name: Print cluster_id
+      debug:
+        var: cluster_id
+
+    - name: Get One Backup Configuration By Cluster in the Project
+      uri:
+        url: "{{ ops_mgr_api_endpoint_backupConfigs }}/{{ cluster_id }}"
+        user: "{{ project_api_public_key }}"
+        password: "{{ project_api_private_key }}"
+        method: GET
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        status_code: 200
+        validate_certs: false
+      register: get_one_backup_configuration_by_cluster_response
+
+    - name: Print get_one_backup_configuration_by_cluster_response
+      debug:
+        var: get_one_backup_configuration_by_cluster_response
+
+    - name: Print get_one_backup_configuration_by_cluster_response.json
+      debug:
+        var: get_one_backup_configuration_by_cluster_response.json
+
+    - name: find statusName by jq
+      shell: |
+        echo '{{ get_one_backup_configuration_by_cluster_response.json | to_json }}' | jq '.statusName'
+      register: find_status_name_result
+
+    - name: Define status_name
+      set_fact:
+        status_name: "{{ find_status_name_result.stdout | replace('\"', '') }}"
+
+    - name: Print status_name
+      debug:
+        var: status_name
+
+    - name: Update One Backup Configuration When the field status_name equals "INACTIVE" or "STOPPED"
+      block:
+        - name: Update One Backup Configuration for Sharded Cluster
+          uri:
+            url: "{{ ops_mgr_api_endpoint_backupConfigs }}/{{ cluster_id }}"
+            user: "{{ project_api_public_key }}"
+            password: "{{ project_api_private_key }}"
+            method: PATCH
+            headers:
+              Accept: "application/json"
+              Content-Type: "application/json"
+            body_format: json
+            body: |
+              {
+                "authMechanismName": "NONE",
+                "syncSource": "SECONDARY",
+                "encryptionEnabled": true,
+                "sslEnabled": true,
+                "statusName": "STARTED",
+                "storageEngineName": "WIRED_TIGER"
+              }
+            status_code: 202
+            validate_certs: false
+          register: update_backup_daemon_configuration_response
+
+        - name: Print update_backup_daemon_configuration_response
+          debug:
+            var: update_backup_daemon_configuration_response
+      when: (status_name == "INACTIVE") or (status_name == "STOPPED")
+  when: cluster_type == "sharded-cluster"
+
+- name: The Cluster Type of {{ cluster_name }} is Replica Set Cluster
+  block:
+    - name: find cluster_id by cluster_name by jq
+      shell: |
+        echo '{{ get_all_clusters_by_project_response.json | to_json }}' | jq '.results[] | select(.clusterName == "{{ cluster_name }}" and .typeName == "REPLICA_SET").id'
+      register: find_cluster_id_result
+
+    - name: Define cluster_id
+      set_fact:
+        cluster_id: "{{ find_cluster_id_result.stdout | replace('\"', '') }}"
+
+    - name: Print cluster_id
+      debug:
+        var: cluster_id
+
+    - name: Get One Backup Configuration By Cluster in the Project
+      uri:
+        url: "{{ ops_mgr_api_endpoint_backupConfigs }}/{{ cluster_id }}"
+        user: "{{ project_api_public_key }}"
+        password: "{{ project_api_private_key }}"
+        method: GET
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        status_code: 200
+        validate_certs: false
+      register: get_one_backup_configuration_by_cluster_response
+
+    - name: Print get_one_backup_configuration_by_cluster_response
+      debug:
+        var: get_one_backup_configuration_by_cluster_response
+
+    - name: Print get_one_backup_configuration_by_cluster_response.json
+      debug:
+        var: get_one_backup_configuration_by_cluster_response.json
+
+    - name: find statusName by jq
+      shell: |
+        echo '{{ get_one_backup_configuration_by_cluster_response.json | to_json }}' | jq '.statusName'
+      register: find_status_name_result
+
+    - name: Define status_name
+      set_fact:
+        status_name: "{{ find_status_name_result.stdout | replace('\"', '') }}"
+
+    - name: Print status_name
+      debug:
+        var: status_name
+
+    - name: Update One Backup Configuration When the field status_name equals "INACTIVE" or "STOPPED"
+      block:
+        - name: Update One Backup Configuration for Replica Set Cluster
+          uri:
+            url: "{{ ops_mgr_api_endpoint_backupConfigs }}/{{ cluster_id }}"
+            user: "{{ project_api_public_key }}"
+            password: "{{ project_api_private_key }}"
+            method: PATCH
+            headers:
+              Accept: "application/json"
+              Content-Type: "application/json"
+            body_format: json
+            body: |
+              {
+                "authMechanismName": "NONE",
+                "syncSource": "SECONDARY",
+                "encryptionEnabled": true,
+                "sslEnabled": true,
+                "statusName": "STARTED",
+                "storageEngineName": "WIRED_TIGER"
+              }
+            status_code: 202
+            validate_certs: false
+          register: update_backup_daemon_configuration_response
+
+        - name: Print update_backup_daemon_configuration_response
+          debug:
+            var: update_backup_daemon_configuration_response
+      when: (status_name == "INACTIVE") or (status_name == "STOPPED")
+  when: cluster_type == "replica-set-cluster"
+
+- name: Get All Backup Configurations for One Project
+  uri:
+    url: "{{ ops_mgr_api_endpoint_backupConfigs }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_all_backup_configuration_by_project_response
+
+- name: Print get_all_backup_configuration_by_project_response
+  debug:
+    var: get_all_backup_configuration_by_project_response
+
+- name: Print get_all_backup_configuration_by_project_response.json
+  debug:
+    var: get_all_backup_configuration_by_project_response.json

@@ -1,0 +1,42 @@
+---
+- name: Find One Organization by Name
+  uri:
+    url: "{{ ops_mgr_api_endpoint_orgs }}?pageNum={{ orgs_param_pageNum }}&itemsPerPage={{ orgs_param_itemsPerPage }}&name={{ orgs_param_name }}&includeDeletedOrgs={{ orgs_param_includeDeletedOrgs }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: [200, 404]
+    validate_certs: false
+  register: find_existed_org_response
+
+- name: Print find_existed_org_response
+  debug:
+    var: find_existed_org_response
+
+- name: Sets of operations for creating a new organization
+  block:
+    - name: Create One Organization
+      uri:
+        url: "{{ ops_mgr_api_endpoint_orgs }}"
+        user: "{{ global_owner_public_key }}"
+        password: "{{ global_owner_private_key }}"
+        method: POST
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+        body_format: json
+        body: |
+          {
+            "name": "{{ ops_mgr_organization_name }}"
+          }
+        status_code: 201
+        validate_certs: false
+      register: create_one_org_response
+
+    - name: Print create_one_org_response
+      debug:
+        msg: "{{ create_one_org_response }}"
+  when: find_existed_org_response.status == 404

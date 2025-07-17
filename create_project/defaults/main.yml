@@ -1,0 +1,11 @@
+## <Replace to Your Organization ID>
+organization_id: "684fc237f0acac4c5ab42510"
+
+## <Replace to Your Project Name>
+project_name: "Sharded-Project"
+
+## <Replace to Your Username for scp>
+scp_source_user: "jiacy"
+
+## <Replace to Your Password for scp>
+scp_source_pwd: "123456"

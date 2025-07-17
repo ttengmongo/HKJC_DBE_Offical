@@ -1,0 +1,103 @@
+---
+- name: Get the Automation Configuration for Active Agent Monitoring
+  uri:
+    url: "{{ ops_mgr_api_endpoint_automationConfig }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_automation_configuration_response
+
+- name: Print get_automation_configuration_response
+  debug:
+    var: get_automation_configuration_response
+
+- name: Define current_automation_config_json
+  set_fact:
+    current_automation_config_json: "{{ get_automation_configuration_response.json }}"
+
+- name: Print current_automation_config_json
+  debug:
+    var: current_automation_config_json
+
+- name: Write into the file {{ ops_mgr_api_current_automation_config }}
+  copy:
+    content: "{{ current_automation_config_json }}"
+    dest: "{{ ops_mgr_api_current_automation_config }}"
+    mode: '0755'
+    owner: root
+    group: root
+  register: write_current_config_result
+
+- name: Print write_current_config_result
+  debug:
+    var: write_current_config_result
+
+- name: Define var monitoringVersions
+  set_fact:
+    monitoringVersions: '{{ monitoringVersions | default([]) + [{"hostname": item, "name": monitoringVersions_name}] }}'
+  loop: "{{ hostname_list }}"
+
+- name: Convert var monitoringVersions to Json
+  set_fact:
+    monitoringVersions: '{{ monitoringVersions | to_json }}'
+
+- name: Print var monitoringVersions
+  debug:
+    var: monitoringVersions
+
+- name: Use jq to generate the file {{ ops_mgr_api_updated_automation_config }}
+  shell: |
+    jq '.monitoringVersions = ((.monitoringVersions + {{ monitoringVersions }}) | group_by(.hostname) | map(.[0]))' {{ ops_mgr_api_current_automation_config }} \
+    > {{ ops_mgr_api_updated_automation_config }}
+  register: write_updated_config_result
+
+- name: Print write_updated_config_result
+  debug:
+    var: write_updated_config_result
+
+- name: Change ownership of {{ ops_mgr_api_updated_automation_config }}
+  file:
+    path: "{{ ops_mgr_api_updated_automation_config }}"
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Read file from remote node into updated_automation_config
+  slurp:
+    src: "{{ ops_mgr_api_updated_automation_config }}"
+  register: updated_automation_config
+
+- name: Print updated_automation_config
+  debug:
+    msg: "{{ updated_automation_config.content | b64decode }}"
+
+- name: Define updated_automation_config_json
+  set_fact:
+    updated_automation_config_json: "{{ updated_automation_config.content | b64decode }}"
+
+- name: Print updated_automation_config_json
+  debug:
+    var: updated_automation_config_json
+
+- name: Update the Automation Configuration for Active Agent Monitoring
+  uri:
+    url: "{{ ops_mgr_api_endpoint_automationConfig }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: PUT
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body: "{{ updated_automation_config_json | to_json }}"
+    status_code: 200
+    validate_certs: false
+  register: update_automation_configuration_response
+
+- name: Print update_automation_configuration_response
+  debug:
+    var: update_automation_configuration_response

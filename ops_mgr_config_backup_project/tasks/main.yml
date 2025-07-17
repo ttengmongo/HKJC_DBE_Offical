@@ -1,0 +1,20 @@
+---
+- import_tasks: get_play_group_name.yml
+  tags: get_play_group_name
+  when: inventory_hostname not in groups['ops-mgr-application']
+
+- import_tasks: get_cluster_type.yml
+  tags: get_cluster_type
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: get_hostname_list.yml
+  tags: get_hostname_list
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: active_agent_backup.yml
+  tags: active_agent_backup
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: active_cluster_backup.yml
+  tags: active_cluster_backup
+  when: inventory_hostname == groups['ops-mgr-application'][0]

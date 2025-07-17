@@ -1,0 +1,12 @@
+- name: Change owner to mongodb-mms if the node is Ops Manager
+  become: true
+  file:
+    path: '{{ server_cert_installation_path }}{{ ansible_hostname }}.pem'
+    owner: '{{ ops_server_cert_remote_owner }}'
+    group: '{{ ops_server_cert_remote_group }}'
+  register: chown_result
+  changed_when: chown_result.changed
+
+- name: Display change owner result
+  debug:
+    msg: "Changed owner to mongodb-mms: {{ chown_result }}"

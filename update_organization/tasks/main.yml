@@ -1,0 +1,3 @@
+---
+- import_tasks: rename_one_organization.yml
+  tags: rename_one_organization

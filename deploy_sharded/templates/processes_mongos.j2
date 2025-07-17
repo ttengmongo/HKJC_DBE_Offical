@@ -1,0 +1,50 @@
+{
+    "args2_6": {
+        "auditLog": {
+		    "destination": "{{ mongos_args2_6_auditLog_destination }}",
+            "filter": "{{ mongos_args2_6_auditLog_filter }}"
+        },
+        "net": {
+            "bindIp": "{{ mongos_args2_6_net_bindIp }}",
+            "port": {{ mongos_args2_6_net_port }},
+            "tls": {
+                "certificateKeyFile": "{{ mongos_args2_6_net_tls_certificateKeyFile }}",
+                "disabledProtocols": "{{ mongos_args2_6_net_tls_disabledProtocols }}",
+                "mode": "{{ mongos_args2_6_net_tls_mode }}"
+            }
+        },
+        "security": {
+            "enableEncryption": {{ mongos_args2_6_security_enableEncryption | lower}},
+            "encryptionKeyFile": "{{ mongos_args2_6_security_encryptionKeyFile}}",
+            "javascriptEnabled": {{ mongos_args2_6_security_javascriptEnabled | lower}}
+        },
+        "setParameter": {
+            "auditAuthorizationSuccess": "{{ mongos_args2_6_setParameter_auditAuthorizationSuccess }}"
+        },
+        "systemLog": {
+            "destination": "{{ mongos_args2_6_systemLog_destination }}",
+            "logAppend": {{ mongos_args2_6_systemLog_logAppend | lower}},
+            "path": "{{ mongos_args2_6_systemLog_path }}"
+        }
+    },
+    "auditLogRotate": {
+        "sizeThresholdMB": {{ mongos_instance_auditLogRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ mongos_instance_auditLogRotate_timeThresholdHrs }}
+    },
+    "authSchemaVersion": {{ mongos_instance_authSchemaVersion }},
+    "cluster": "{{ mongos_instance_cluster }}",
+    "disabled": {{ mongos_instance_disabled | lower}},
+    "featureCompatibilityVersion": "{{ mongos_instance_featureCompatibilityVersion }}",
+    "hostname": "{{ mongos_instance_hostname }}",
+    "kerberos": {
+        "keytab": "{{ mongos_instance_kerberos_keytab }}"
+    },
+    "logRotate": {
+        "sizeThresholdMB": {{ mongos_instance_logRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ mongos_instance_logRotate_timeThresholdHrs }}
+    },
+    "manualMode": {{ mongos_instance_manualMode | lower}},
+    "name": "{{ mongos_instance_name }}",
+    "processType": "{{ mongos_instance_processType }}",
+    "version": "{{ mongos_instance_version }}"
+}

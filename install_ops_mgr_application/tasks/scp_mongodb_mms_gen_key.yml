@@ -1,0 +1,32 @@
+---
+- name: Define scp_source
+  set_fact:
+    scp_source: "{{ groups['ops-mgr-application'][0] }}"
+
+- name: Print vars scp_source
+  debug:
+    msg: '{{scp_source}}'
+
+- name: Delete existed {{ mms_gen_key_path }}{{ mms_gen_key_file }}
+  file:
+    path: '{{ mms_gen_key_path }}{{ mms_gen_key_file }}'
+    state: absent
+
+
+- name: Scp {{ tmp_mongodb_scp }}/{{ mms_gen_key_file }} from remote to local
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ scp_source_user }}@{{ scp_source }}:{{ tmp_mongodb_scp }}/{{ mms_gen_key_file }} {{ mms_gen_key_path }}{{ mms_gen_key_file }}
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  args:
+    executable: /usr/bin/expect
+
+- name: Modify file permission
+  file:
+    path: "{{ mms_gen_key_path }}{{ mms_gen_key_file }}"
+    mode: '0600'
+    owner: mongodb-mms
+    group: mongodb-mms

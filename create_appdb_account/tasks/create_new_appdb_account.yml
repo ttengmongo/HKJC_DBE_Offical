@@ -1,0 +1,33 @@
+---
+- name: Create One AppDB Account
+  command: >
+    mongosh 
+      --host {{ appdb_rs_name }}/{{ groups['ops-mgr-appdb'][0] }} 
+      --port {{ appdb_port }} 
+      --tls 
+      --tlsCAFile {{ mdb_cert_root_ca }} 
+      --authenticationDatabase admin 
+      -u {{ first_db_account_name }} 
+      -p {{ first_db_account_pwd }} 
+      --eval 'use admin' 
+      --eval 'db.createUser({{ new_db_account }})'
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Check Login with the New Added Account {{ new_db_account_name }}
+  command: >
+    mongosh 
+      --host {{ appdb_rs_name }}/{{ groups['ops-mgr-appdb'][0] }} 
+      --port {{ appdb_port }} 
+      --tls 
+      --tlsCAFile {{ mdb_cert_root_ca }} 
+      --authenticationDatabase admin 
+      -u {{ new_db_account_name }} 
+      -p {{ new_db_account_pwd }} 
+      --eval '{{ mongosh_cmd_conn_status }}'
+  register: check_login_result
+
+- name: Print check_login_result
+  debug:
+    msg: "{{ check_login_result }}"

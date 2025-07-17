@@ -1,0 +1,49 @@
+---
+- name: Restart Ops Manager related MongoDB services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop: "{{ ops_manager_instances }}"
+  register: restart_result
+
+- name: Display Restart Ops Manager related MongoDB services_result
+  debug:
+    msg: "Restarted the MongoDB services: {{ restart_result }}"
+
+- name: Wait for 30 seconds to ensure mongod is running
+  pause:
+    seconds: 30
+
+- name: Check if AppDB is running
+  systemd:
+    name: mongod
+    state: started
+  register: mongod_status
+
+- name: Display AppDB status
+  debug:
+    msg: "Mongod status is : {{ mongod_status.status.ActiveState }} and state time was : {{ mongod_status.status.ExecMainStartTimestamp }}"
+
+#- name: Check if BlockStoreDB is running
+#  systemd:
+#    name: blockstore_mongod
+#    state: started
+#  register: blockstore_mongod_status
+
+#- name: Display BlockStoreDB status
+#  debug:
+#    msg: "blockstore_mongod_status status is : {{ blockstore_mongod_status.status.ActiveState }} and state time was : {{ blockstore_mongod_status.status.ExecMainStartTimestamp }}"
+
+
+- name: Populate service facts
+  service_facts:
+
+#    - name: Print mongod and mongodb-mms service facts
+#      debug:
+#        var: ansible_facts.services
+
+- name: Print mongod and mongodb-mms service facts
+  debug:
+    msg:
+      - "mongod.service: {{ ansible_facts.services['mongod.service'] }}"
+  ignore_errors: yes

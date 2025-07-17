@@ -1,0 +1,61 @@
+---
+- name: Check if existed {{ auth_keyfile }}
+  stat:
+    path: "{{ auth_keyfile }}"
+  register: check_stat_result
+
+- name: Print check_stat_result
+  debug:
+    msg: "{{ check_stat_result }}"
+
+- name: Generate key for auth.key when not existed
+  block:
+    - name: Generate key by shell
+      shell: openssl rand -base64 756
+      register: generate_auth_key_result
+
+    - name: Print generate_auth_key_result
+      debug:
+        msg: "{{ generate_auth_key_result }}"
+
+    - name: Define var global_auth_key
+      set_fact:
+        global_auth_key: "{{ generate_auth_key_result.stdout }}"
+      delegate_to: localhost
+      delegate_facts: true
+
+    - name: Create the file {{ auth_keyfile }}
+      file:
+        path: "{{ auth_keyfile }}"
+        state: touch
+        mode: '0600'
+        owner: mongod
+        group: mongod
+
+    - name: Write into the file {{ auth_keyfile }}
+      copy:
+        content: "{{ hostvars['localhost'].global_auth_key }}"
+        dest: "{{ auth_keyfile }}"
+  when: not check_stat_result.stat.exists
+
+- name: Read from {{ auth_keyfile }} as auth.key when existed
+  block:
+    - name: Read file from remote node into auth_keyfile_result
+      slurp:
+        src: "{{ auth_keyfile }}"
+      register: auth_keyfile_result
+
+    - name: Print auth_keyfile_result.content
+      debug:
+        msg: "{{ auth_keyfile_result.content | b64decode }}"
+
+    - name: Define var global_auth_key
+      set_fact:
+        global_auth_key: "{{ auth_keyfile_result.content | b64decode }}"
+      delegate_to: localhost
+      delegate_facts: true
+  when: check_stat_result.stat.exists
+
+- name: Print global_auth_key
+  debug:
+    msg: "{{ hostvars['localhost'].global_auth_key }}"

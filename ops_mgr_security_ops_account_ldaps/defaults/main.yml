@@ -1,0 +1,12 @@
+## <Replace to Your LDAP URI>
+mms_ldap_url_customized: ldap://windc01.win.betting.hkjc.org.hk:389 ldap://windc02.win.betting.hkjc.org.hk:389 ldap://windc03.win.betting.hkjc.org.hk:389 ldap://windc04.win.betting.hkjc.org.hk:389
+## <Replace to Your LDAP Bind Dn>
+mms_ldap_bindDn_customized: CN\=ma_mgdb_authuser,OU\=Service Accounts,DC\=win,DC\=betting,DC\=hkjc,DC\=org,DC\=hk
+## <Replace to Your LDAP Bind Password>
+mms_ldap_bindPassword_customized: 123456
+## <Replace to Your LDAP User Base Dn>
+mms_ldap_user_baseDn_customized: CN\=Users,DC\=win,DC\=betting,DC\=hkjc,DC\=org,DC\=hk
+## <Replace to Your LDAP Group Base Dn
+mms_ldap_group_baseDn_customized: CN\=Users,DC\=win,DC\=betting,DC\=hkjc,DC\=org,DC\=hk
+## <Replace to Your LDAP Global Role Owner>
+mms_ldap_global_role_owner_customized: CN\=ma_mgdb_install_gp,CN\=Users,DC\=win,DC\=betting,DC\=hkjc,DC\=org,DC\=hk

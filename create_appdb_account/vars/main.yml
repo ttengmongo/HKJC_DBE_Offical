@@ -1,0 +1,9 @@
+appdb_port: 38132
+appdb_rs_name: rs_backingdb
+
+mdb_cert_root_ca: /etc/ssl/mongodb/mongodb_rootCA.pem
+
+first_db_account_name: 'dbadmin'
+first_db_account_pwd: 'dbadmin'
+
+mongosh_cmd_conn_status: 'db.runCommand({connectionStatus: 1})'

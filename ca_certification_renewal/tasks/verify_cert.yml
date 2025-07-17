@@ -1,0 +1,84 @@
+---
+- name: Check if existing PEM file exists
+  stat:
+    path: /etc/ssl/{{ ca_cert_remote_name }}
+  register: existing_pem_file
+
+- name: Display existing PEM file
+  debug:
+    msg: "Existing PEM file: {{ existing_pem_file }}"
+
+- name: Create backup directory if it does not exist
+  file:
+    path: '{{ ca_cert_remote_backup_folder }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  register: create_backup_dir_result
+  changed_when: create_backup_dir_result.changed
+
+- name: Display create backup directory result
+  debug:
+    msg: "Created backup directory: {{ create_backup_dir_result }}"
+
+- name: Backup existing PEM file
+  copy:
+    src: '/etc/ssl/{{ ca_cert_remote_name }}'
+    dest: '{{ ca_cert_remote_backup_folder }}{{ ca_cert_remote_name }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}_bak'
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
+  when: existing_pem_file.stat.exists
+  register: backup_pem_result
+  changed_when: backup_pem_result.changed
+
+- name: Display backup PEM file result
+  debug:
+    msg: "Backup PEM file: {{ backup_pem_result }}"
+
+- name: Display newServerCert.pem path
+  debug:
+    msg: "New CA cert: {{ ca_cert_remote_dest }}newCaCert.pem"
+
+- name: Copy newCaCert.pem to existing SSL cert file
+  copy:
+    src: '{{ ca_cert_remote_dest }}newCaCert.pem'
+    dest: '/etc/ssl/{{ ca_cert_remote_name }}'
+    owner: root
+    group: root
+    mode: '0750'
+    remote_src: true
+  register: copy_pem_result
+  changed_when: copy_pem_result.changed
+
+- name: Display copy SSL cert file result
+  debug:
+    msg: "Copied SSL cert file: {{ copy_pem_result }}"
+
+- name: Get certificate details
+  command: openssl x509 -in /etc/ssl/{{ ca_cert_remote_name }} -text
+  register: cert_result
+  changed_when: false
+
+- name: Display certificate details
+  debug:
+    var: cert_result.stdout.splitlines()
+
+- name: Remove the copied cert, generated private key, signed cert, newServerCert.pem
+  become: true
+  command: >
+    rm
+    {{ ca_cert_remote_dest }}caCertKey.pem
+    {{ ca_cert_remote_dest }}caCert.pem
+    {{ ca_cert_remote_dest }}newCaCert.pem
+    {{ ca_cert_remote_dest }}{{ ca_cert_remote_pfx_name }}
+  args:
+    chdir: '{{ ca_cert_remote_dest }}'
+  register: remove_result
+  changed_when: false
+
+- name: Display remove result
+  debug:
+    msg: "Removed the generated private key and signed cert: {{ remove_result }}"

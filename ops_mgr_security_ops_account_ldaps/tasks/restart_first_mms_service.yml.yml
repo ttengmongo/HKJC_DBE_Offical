@@ -1,0 +1,18 @@
+---
+- name: Restart the mongodb-mms.service
+  systemd:
+    name: mongodb-mms
+    state: restarted
+    enabled: true
+  ignore_errors: true
+
+- name: Wait for the port {{ mms_conf_base_ssl_port }} to be accessible for mongodb-mms.service
+  wait_for:
+    port: "{{ mms_conf_base_ssl_port }}"
+    host: "{{ inventory_hostname }}"
+    timeout: 300
+  register: restart_mms_result
+
+- name: Print restart_mms_result
+  debug:
+    msg: "{{ restart_mms_result }}"

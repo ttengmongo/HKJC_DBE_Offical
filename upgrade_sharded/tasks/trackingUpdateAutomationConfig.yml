@@ -1,0 +1,4 @@
+---
+- name: Tracking automation config update
+  include_tasks: tracking.yml
+  with_sequence: count=10

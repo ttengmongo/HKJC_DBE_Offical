@@ -1,0 +1,27 @@
+---
+#- import_tasks: thp.yml
+#  tags: thp
+
+#- import_tasks: install_mongosh.yml
+#  tags: install_mongosh
+
+- import_tasks: stop_db.yml
+  tags: stop_db
+
+- import_tasks: backup.yml
+  tags: backup
+
+- import_tasks: upgrade_db.yml
+  tags: upgrade_db
+
+- import_tasks: modify_mongod_service.yml
+  tags: modify_mongod_service
+
+- import_tasks: restart_db.yml
+  tags: restart_db
+
+- import_tasks: db_health_check.yml
+  tags: db_health_check
+
+- import_tasks: setFCV.yml
+  tags: set_fcv

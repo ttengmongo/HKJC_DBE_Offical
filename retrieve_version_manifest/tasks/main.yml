@@ -1,0 +1,6 @@
+---
+- import_tasks: retrieve_version_manifest_json.yml
+  tags: retrieve_version_manifest_json
+
+- import_tasks: scp_version_manifest_json.yml
+  tags: scp_version_manifest_json

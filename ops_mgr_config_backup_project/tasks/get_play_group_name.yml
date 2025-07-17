@@ -1,0 +1,8 @@
+---
+- name: Define play_group_name
+  set_fact:
+    play_group_name: "{{ group_names }}"
+
+- name: Print play_group_name
+  debug:
+    var: play_group_name

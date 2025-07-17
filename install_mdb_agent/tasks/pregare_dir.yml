@@ -1,0 +1,8 @@
+---
+- name: Create dir {{ ops_mgr_api_tmp_path }}
+  file:
+    path: '{{ ops_mgr_api_tmp_path }}'
+    state: directory
+    mode: '0777'
+    owner: root
+    group: root

@@ -1,0 +1,50 @@
+---
+- name: Start tuned service
+  systemd:
+    name: tuned
+    state: started
+  register: tuned_result
+
+- name: Display the tuned service start result
+  debug:
+    msg: "Tuned service start result: {{ tuned_result.status }}"
+
+- name: Enable tuned service
+  systemd:
+    name: tuned
+    enabled: yes
+  register: tuned_result
+
+- name: Display the tuned service enable result
+  debug:
+    msg: "Tuned service enable result: {{ tuned_result.status }}"
+
+- name: Create directory for MongoDB tuned profile
+  file:
+    path: /etc/tuned/mongodb
+    state: directory
+    mode: '0755'
+
+- name: Copy tuned profile configuration file
+  copy:
+    src: ./mongodb-tuned.conf
+    dest: /etc/tuned/mongodb/tuned.conf
+    mode: '0644'
+
+- name: Set tuned profile to mongodb
+  command: tuned-adm profile mongodb
+  register: tuned_profile_result
+  changed_when: false
+
+- name: Display the tuned profile result
+  debug:
+    msg: "Tuned profile result: {{ tuned_profile_result }}"
+
+- name: Verify tuned profile is active
+  command: tuned-adm active
+  register: tuned_profile_check
+  changed_when: false
+
+- name: Display the active tuned profile
+  debug:
+    msg: "Active tuned profile: {{ tuned_profile_check.stdout }}"

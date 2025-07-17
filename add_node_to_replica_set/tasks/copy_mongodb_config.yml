@@ -1,0 +1,123 @@
+---
+- name: Create directories for mongodb ssl
+  file:
+    path: "{{ source_ssl_path }}"
+    state: directory
+
+
+- name: Create directories for config files
+  file:
+    path: "{{ scp_dest_folder }}"
+    state: directory
+    mode: "0755"
+
+- name: Set read permissions for source file
+  shell: |
+    set timeout 1
+    spawn ssh -oStrictHostKeyChecking=no {{scp_user}}@{{ source_host }}
+    expect "Password:"
+    send "{{ scp_password }}\r"
+    expect "*\]*#"
+    send "sudo chmod {{ item.mode }} {{ item.src }}\r"
+    expect "*\]*#"
+    exit 0
+  args:
+    executable: /usr/bin/expect
+  loop:
+    - { src: '{{ source_ssl_path }}{{ server_cert_pem_name }}', mode: '0754' }
+    - { src: '{{ source_ssl_path }}{{ ca_pem_name }}', mode: '0754' }
+    - { src: '/etc/mongodb-mms/automation-agent.config', mode: '0644' }
+    - { src: '{{ keyfile_path }}{{ keyfile_name }}', mode: '0644' }
+  register: set_permissions_result
+
+
+- name: Display the set permissions result
+  debug:
+    msg: "Set permissions result: {{ set_permissions_result }}"
+
+
+- name: Download MongoDB_Config to folder
+  shell: |
+    set timeout 5
+    {{ scp_command }}{{ source_host }}:{{ item.src }} {{ item.dest }}
+    expect "Password:"
+    send "{{ scp_password }}\r"
+    expect "*\]*#"
+    exit 0
+  args:
+    executable: /usr/bin/expect
+  loop:
+    - { src: '{{ source_ssl_path }}{{ server_cert_pem_name }}', dest: '{{ scp_dest_folder }}{{ ansible_hostname }}.pem' }
+    - { src: '{{ source_ssl_path }}{{ ca_pem_name }}', dest: '{{ scp_dest_folder }}{{ ca_pem_name }}' }
+    - { src: '{{ mongodb_config_path }}', dest: '{{ scp_dest_folder }}mongod.conf' }
+    - { src: '/etc/mongodb-mms/automation-agent.config', dest: '{{ scp_dest_folder }}automation-agent.config' }
+    - { src: '{{ keyfile_path }}{{ keyfile_name }}', dest: '{{ scp_dest_folder }}{{ keyfile_name }}' }
+    - { src: '/usr/lib/systemd/system/mongod.service', dest: '{{ scp_dest_folder }}mongod.service' }
+  register: copy_result
+
+- name: Display the copy result
+  debug:
+    msg: "Copy result: {{ copy_result }}"
+
+- name: Disable read permissions for source file
+  shell: |
+    set timeout 1
+    spawn ssh -oStrictHostKeyChecking=no {{scp_user}}@{{ source_host }}
+    expect "Password:"
+    send "{{ scp_password }}\r"
+    expect "*\]*#"
+    send "sudo chmod {{ item.mode }} {{ item.src }}\r"
+    expect "*\]*#"
+    exit 0
+  args:
+    executable: /usr/bin/expect
+  loop:
+    - { src: '{{ source_ssl_path }}{{ server_cert_pem_name }}', mode: '0750' }
+    - { src: '{{ source_ssl_path }}{{ ca_pem_name }}', mode: '0750' }
+    - { src: '/etc/mongodb-mms/automation-agent.config', mode: '0640' }
+    - { src: '{{ keyfile_path }}{{ keyfile_name }}', mode: '0600' }
+  register: disable_permissions_result
+
+
+- name: Display the disable permissions result
+  debug:
+    msg: "Disable permissions result: {{ disable_permissions_result }}"
+
+- name: Create mongod directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: mongod
+    group: mongod
+    mode: '0755'
+  changed_when: create_key_dir_result.changed
+  loop:
+    - "{{ data_path }}data"
+    - "{{ data_path }}logs"
+    - "{{ keyfile_path }}"
+  register: create_key_dir_result
+
+- name: display create_key_dir_result
+  debug:
+    msg: "Create key dir result: {{ create_key_dir_result }}"
+
+- name: Copy MongoDB config to /etc
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+    remote_src: true
+  loop:
+    - { src: "{{ scp_dest_folder }}{{ ansible_hostname }}.pem", dest: "{{ source_ssl_path }}{{ ansible_hostname }}.pem" }
+    - { src: "{{ scp_dest_folder }}{{ ca_pem_name }}", dest: "{{ source_ssl_path }}{{ ca_pem_name }}" }
+    - { src: "{{ scp_dest_folder }}{{ keyfile_name }}", dest: "{{ keyfile_path }}{{ keyfile_name }}" }
+    - { src: "{{ scp_dest_folder }}mongod.conf", dest: "/etc/mongod.conf" }
+    - { src: "{{ scp_dest_folder }}mongod.conf", dest: "{{ data_path }}mongod.conf" }
+
+- name: Create symbolic link for server certificate
+  file:
+    src: "{{ source_ssl_path }}{{ ansible_hostname }}.pem"
+    dest: "{{ source_ssl_path }}mongodb_server.pem"
+    state: link

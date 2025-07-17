@@ -1,0 +1,12 @@
+- name: Set owner and group for the new SSL cert file
+  file:
+    path: '/etc/ssl/{{ ca_cert_remote_name }}'
+    owner: '{{ ca_cert_remote_owner }}'
+    group: '{{ ca_cert_remote_group }}'
+    mode: '{{ ca_cert_remote_mode }}'
+  register: set_owner_group_result
+  changed_when: set_owner_group_result.changed
+
+- name: Display set owner and group result
+  debug:
+    msg: "Set owner and group for the new SSL cert file: {{ set_owner_group_result }}"

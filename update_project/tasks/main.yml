@@ -1,0 +1,3 @@
+---
+- import_tasks: rename_one_project.yml
+  tags: rename_one_project

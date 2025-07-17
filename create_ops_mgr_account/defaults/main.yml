@@ -1,0 +1,26 @@
+## <Replace to Your New Added User's Granted Organization ID>
+grant_new_added_user_to_org_id: '682c3f6f7d5ae067761a7ee2'
+
+## <Replace to Your New Added User's Granted Project ID>
+grant_new_added_user_to_project_id: '682c44817d5ae067761a8391'
+
+## <Replace to Your New Added User's Granted Organization Role Name>
+grant_new_added_user_to_org_roleName: 'ORG_OWNER'
+
+## <Replace to Your New Added User's Granted Project Role Name>
+grant_new_added_user_to_project_roleName: 'GROUP_OWNER'
+
+## <Replace to Your New Added User's Username>
+new_added_username: 'hkjc_test_user'
+
+## <Replace to Your New Added User's Password>
+new_added_password: 'Hkjc_test_user_001'
+
+## <Replace to Your New Added User's Firstname>
+new_added_firstName: 'San'
+
+## <Replace to Your New Added User's Lastname>
+new_added_lastName: 'Zhang'
+
+## <Replace to Your New Added User's Email>
+new_added_emailAddress: 'hkjc_test_user@hkjc.com'

@@ -1,0 +1,21 @@
+---
+- import_tasks: fetch_ops_mgr_api_keys.yml
+  tags: fetch_ops_mgr_api_keys
+
+- import_tasks: prepare_head_dir.yml
+  tags: prepare_head_dir
+
+- import_tasks: config_backup_daemon.yml
+  tags: config_backup_daemon
+
+- import_tasks: get_hostname_list.yml
+  tags: get_hostname_list
+  when: inventory_hostname == play_hosts[0] and is_continue
+
+- import_tasks: config_snapshot_storage.yml
+  tags: config_snapshot_storage
+  when: inventory_hostname == play_hosts[0] and is_continue
+
+- import_tasks: config_oplog_storage.yml
+  tags: config_oplog_storage
+  when: inventory_hostname == play_hosts[0] and is_continue

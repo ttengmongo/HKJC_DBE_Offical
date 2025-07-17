@@ -1,0 +1,9 @@
+---
+- name: Set ip address to bind
+  replace:
+    path: "{{ item }}"
+    regexp: '^  bindIp:.*'
+    replace: '  bindIp: 127.0.0.1,{{ ansible_default_ipv4.address }}'
+  loop:
+    - "/etc/mongod.conf"
+    - "{{ data_path }}mongod.conf"

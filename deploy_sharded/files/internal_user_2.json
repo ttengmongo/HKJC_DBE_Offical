@@ -1,0 +1,29 @@
+{
+    "authenticationRestrictions": [],
+    "db": "admin",
+    "mechanisms": [],
+    "roles": [
+        {
+            "db": "admin",
+            "role": "clusterAdmin"
+        },
+        {
+            "db": "admin",
+            "role": "readAnyDatabase"
+        },
+        {
+            "db": "admin",
+            "role": "userAdminAnyDatabase"
+        },
+        {
+            "db": "local",
+            "role": "readWrite"
+        },
+        {
+            "db": "admin",
+            "role": "readWrite"
+        }
+    ],
+    "user": "mms-backup-agent",
+    "initPwd": "mms-backup-agent-001"
+}

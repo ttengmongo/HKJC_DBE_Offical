@@ -1,0 +1,54 @@
+---
+- name: Define AppDB Servers with index in the loop
+  set_fact:
+    appdb_server_{{ index }}: "{ _id: {{ index }}, host: '{{ item }}:{{ appdb_port }}', votes: 1, priority: {{ 2 if index ==0 else 1 }} }"
+  loop: "{{ hostname_list }}"
+  loop_control:
+    index_var: index
+
+- name: Merge multiple vars for AppDB Servers into a single var members in array type
+  set_fact:
+    members: "{{ members | default([]) + [ vars['appdb_server_' + index|string] ] }}"
+  loop: "{{ hostname_list }}"
+  loop_control:
+    index_var: index
+
+- name: Convert var members from array to string
+  set_fact:
+    members: "{{ members | join(', ') }}"
+
+- name: Print members
+  debug:
+    var: members
+
+- name: Define vars for Replica Set initiate() command
+  set_fact:
+    str1: "rs.initiate({_id: '{{ appdb_rs_name }}', version: 1, members: ["
+    str2: "{{ members }}"
+    str3: "]})"
+
+- name: Concat vars for Replica Set initiate() command
+  set_fact:
+    initiate_mongosh_cmd: "{{ str1 + str2 + str3 }}"
+
+- name: Print rs_initiate_cmd
+  debug:
+    var: initiate_mongosh_cmd
+
+- name: Check AppDB Status
+  command:
+    cmd: mongosh --port {{ appdb_port }} --tls --tlsAllowInvalidCertificates --eval "rs.status()"
+  register: check_appdb_status
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Execute AppDB Initiate mongosh command
+  command:
+    cmd: mongosh --port {{ appdb_port }} --tls --tlsAllowInvalidCertificates --eval "{{ initiate_mongosh_cmd }}"
+  register: initiate_appdb_result
+  when: check_appdb_status.stderr.find('no replset config') != -1
+
+- name: Print AppDB Initiate Result
+  debug:
+    msg: "{{ initiate_appdb_result }}"

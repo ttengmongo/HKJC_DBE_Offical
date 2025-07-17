@@ -1,0 +1,115 @@
+---
+- name: Check if existing PEM file exists
+  stat:
+    path: '{{ server_cert_installation_path }}{{ ansible_hostname }}.pem'
+  register: existing_pem_file
+
+- name: Display existing PEM file
+  debug:
+    msg: "Existing PEM file: {{ existing_pem_file }}"
+
+- name: Create backup directory if it does not exist
+  file:
+    path: '{{ cert_remote_backup_folder }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  register: create_backup_dir_result
+  changed_when: create_backup_dir_result.changed
+
+- name: Display create backup directory result
+  debug:
+    msg: "Created backup directory: {{ create_backup_dir_result }}"
+
+- name: Backup existing PEM file
+  copy:
+    src: '{{ server_cert_installation_path }}{{ ansible_hostname }}.pem'
+    dest: '{{ cert_remote_backup_folder }}{{ ansible_hostname }}.pem_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}_bak'
+    owner: root
+    group: root
+    mode: '0750'
+    remote_src: true
+  when: existing_pem_file.stat.exists
+  register: backup_pem_result
+  changed_when: backup_pem_result.changed
+
+- name: Display backup PEM file result
+  debug:
+    msg: "Backup PEM file: {{ backup_pem_result }}"
+
+- name: Display newServerCert.pem path
+  debug:
+    msg: "New server cert: {{ server_cert_remote_dest }}newServerCert.pem"
+
+- name: Create MongoDB SSL directory if it does not exist
+  file:
+    path: '{{ server_cert_installation_path }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  register: create_ssl_dir_result
+  changed_when: create_ssl_dir_result.changed
+
+- name: Copy newServerCert.pem to existing SSL cert file
+  copy:
+    src: '{{ server_cert_remote_dest }}newServerCert.pem'
+    dest: '{{ server_cert_installation_path }}{{ ansible_hostname }}.pem'
+    owner: '{{ server_cert_remote_owner }}'
+    group: '{{ server_cert_remote_group }}'
+    mode: '{{ server_cert_remote_mode }}'
+    remote_src: true
+  register: copy_pem_result
+  changed_when: copy_pem_result.changed
+
+- name: Display copy SSL cert file result
+  debug:
+    msg: "Copied SSL cert file: {{ copy_pem_result }}"
+
+- name: Create symbolic link for SSL certificate
+  file:
+    src: '{{ server_cert_installation_path }}{{ ansible_hostname }}.pem'
+    dest: '{{ server_cert_installation_path }}{{ server_cert_remote_symbolic_name }}'
+    state: link
+
+- name: Get certificate details
+  command: openssl x509 -in {{ server_cert_installation_path }}{{ server_cert_remote_symbolic_name }} -text
+  register: cert_result
+  changed_when: false
+
+- name: Display certificate details
+  debug:
+    var: cert_result.stdout.splitlines()
+
+- name: Verify SSL certificates
+  command: openssl verify -CAfile {{ server_cert_installation_path }}{{ ca_cert_remote_symbolic_name }} {{ server_cert_installation_path }}{{ server_cert_remote_symbolic_name }}
+  register: ssl_verify_result
+  changed_when: false
+
+- name: Check SSL verification result
+  fail:
+    msg: "SSL certificate verification failed: {{ ssl_verify_result.stdout }}"
+  when: ssl_verify_result.stdout.find('OK') == -1
+
+- name: Display SSL verification result
+  debug:
+    var: ssl_verify_result.stdout
+  changed_when: true
+
+- name: Remove the copied cert, generated private key, signed cert, newServerCert.pem
+  become: true
+  command: >
+    rm
+    {{ server_cert_remote_dest }}serverCertKey.pem
+    {{ server_cert_remote_dest }}serverCert.pem
+    {{ server_cert_remote_dest }}newServerCert.pem
+    {{ server_cert_remote_dest }}{{ server_cert_remote_name }}
+  args:
+    chdir: '{{ server_cert_remote_dest }}'
+  register: remove_result
+  changed_when: false
+
+- name: Display remove result
+  debug:
+    msg: "Removed the generated private key and signed cert: {{ remove_result }}"

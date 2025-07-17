@@ -1,0 +1,35 @@
+---
+- name: Read file from remote node into version_manifest_json
+  slurp:
+    src: "{{ ops_mgr_version_manifest_json }}"
+  register: version_manifest_json
+
+- name: Print version_manifest_json
+  debug:
+    msg: "{{ version_manifest_json.content | b64decode }}"
+
+- name: Define version_manifest_json_content
+  set_fact:
+    version_manifest_json_content: "{{ version_manifest_json.content | b64decode }}"
+
+- name: Print version_manifest_json_content
+  debug:
+    var: version_manifest_json_content
+
+- name: Update Ops Mgr Version Manifest
+  uri:
+    url: "{{ ops_mgr_api_endpoint_update_versionManifest }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: PUT
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body: "{{ version_manifest_json_content | to_json }}"
+    status_code: 200
+    validate_certs: false
+  register: update_version_manifest_response
+
+- name: Print update_version_manifest_response
+  debug:
+    var: update_version_manifest_response

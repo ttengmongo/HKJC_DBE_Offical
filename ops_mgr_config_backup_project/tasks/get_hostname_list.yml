@@ -1,0 +1,8 @@
+---
+- name: Define hostname_list
+  set_fact:
+    hostname_list: "{{ ansible_play_hosts_all | difference(groups['ops-mgr-application']) | map('extract', hostvars, 'ansible_fqdn') | list | unique}}"
+
+- name: Print hostname_list for {{ cluster_type }}
+  debug:
+    var: hostname_list

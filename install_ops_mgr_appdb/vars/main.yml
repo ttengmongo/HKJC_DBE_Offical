@@ -1,0 +1,58 @@
+install_binary_path: /backup/mongodb_installation/binary
+tmp_mongodb_scp: /tmp/mongodb/scp
+
+mdb_server_pkg: mongodb-enterprise-server
+mdb_server_version: 8.0.4-1.suse15.x86_64
+
+mdb_mongosh_pkg: mongodb-mongosh
+mdb_mongosh_version: 2.3.9.x86_64
+
+mdb_database_tools_pkg: mongodb-database-tools
+mdb_database_tools_version: suse15-x86_64-100.11.0
+
+mdb_cert_root_ca: /etc/ssl/mongodb/mongodb_rootCA.pem
+
+keyfile_root_path: /data/keyfile/
+appdb_keyfile: backingdb-keyfile
+
+appdb_port: 38132
+appdb_data_path: /data/appdb/data/
+appdb_log_path: /data/appdb/logs/
+appdb_log_file: mongodb.log
+appdb_rs_name: rs_backingdb
+
+mongod_conf_net_bindIp: "127.0.0.1,{{ ansible_default_ipv4.address }}"
+mongod_conf_net_port: "{{ appdb_port }}"
+mongod_conf_net_tls_CAFile: /etc/ssl/mongodb/mongodb_rootCA.pem
+mongod_conf_net_tls_allowConnectionsWithoutCertificates: true
+mongod_conf_net_tls_certificateKeyFile: /etc/ssl/mongodb/mongodb_server.pem
+mongod_conf_net_tls_disabledProtocols: TLS1_0,TLS1_1
+mongod_conf_net_tls_mode: requireTLS
+mongod_conf_processManagement_fork: true
+mongod_conf_security_authorization: enabled
+mongod_conf_security_keyFile: "{{ keyfile_root_path }}{{ appdb_keyfile }}"
+mongod_conf_security_javascriptEnabled: false
+mongod_conf_setParameter_authenticationMechanisms: SCRAM-SHA-256
+mongod_conf_storage_dbPath: "{{ appdb_data_path }}"
+mongod_conf_storage_engine: wiredTiger
+mongod_conf_storage_wiredTiger_engineConfig_cacheSizeGB: 8
+mongod_conf_systemLog_destination: file
+mongod_conf_systemLog_path: "{{ appdb_log_path }}{{ appdb_log_file }}"
+mongod_conf_systemLog_logAppend: true
+mongod_conf_replication_replSetName: "{{ appdb_rs_name }}"
+
+mongosh_cmd_conn_status: 'db.runCommand({connectionStatus: 1})'
+
+scp_cmd: "spawn scp -oStrictHostKeyChecking=no"
+
+first_db_account: '{user: "dbadmin", pwd: "dbadmin", roles: [{role: "readWriteAnyDatabase", db: "admin"}, {role: "dbAdminAnyDatabase", db: "admin"}, {role: "userAdminAnyDatabase", db: "admin"}, {role: "clusterAdmin", db: "admin"}, {role: "backup", db: "admin"}, {role: "restore", db: "admin"}]}'
+first_db_account_name: 'dbadmin'
+first_db_account_pwd: 'dbadmin'
+
+other_db_account_1: '{user: "mms", pwd: "mms", roles: [{db: "admin", role: "readWriteAnyDatabase"}, {db: "admin", role: "dbAdminAnyDatabase"}, {db: "admin", role: "clusterMonitor"}]}'
+other_db_account_1_name: 'mms'
+other_db_account_1_pwd: 'mms'
+
+other_db_account_2: '{user: "dbmonitor", pwd: "dbmonitor", roles: [{role: "clusterMonitor", db: "admin"}, {role: "readWriteAnyDatabase", db: "admin"}, {role: "dbAdminAnyDatabase", db: "admin"}]}'
+other_db_account_2_name: 'dbmonitor'
+other_db_account_2_pwd: 'dbmonitor'

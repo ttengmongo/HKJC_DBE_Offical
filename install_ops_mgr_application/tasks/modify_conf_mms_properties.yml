@@ -1,0 +1,141 @@
+---
+- name: Get encrypted username and password from localhost
+  debug:
+    msg:
+      - "{{ hostvars[play_hosts[0]].encrypted_username }}"
+      - "{{ hostvars[play_hosts[0]].encrypted_password }}"
+
+- name: Define appdb_conn_str
+  set_fact:
+    appdb_conn_str: "{{ hostvars[groups['ops-mgr-application'][0]].encrypted_username ~ ':' ~ hostvars[groups['ops-mgr-application'][0]].encrypted_password ~ '@' ~ hostvars[groups['ops-mgr-appdb'][0]].hostname_list | join(appdb_port_split) ~ ':' ~ appdb_port}}"
+
+- name: Print appdb_conn_str
+  debug:
+    var: appdb_conn_str
+
+- name: Modify mongo.mongoUri
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mongo.mongoUri='
+    line: 'mongo.mongoUri=mongodb://{{ appdb_conn_str }}/?maxPoolSize=150&retryWrites=false&retryReads=false&uuidRepresentation=standard'
+    state: present
+    backup: yes
+
+- name: Modify mongo.encryptedCredentials
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mongo.encryptedCredentials='
+    line: 'mongo.encryptedCredentials={{ conf_mms_properties_mongo_encryptedCredentials }}'
+    state: present
+
+- name: Modify mongo.ssl
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mongo.ssl='
+    line: 'mongo.ssl={{ conf_mms_properties_mongo_ssl }}'
+    state: present
+
+- name: Modify mongodb.ssl.CAFile
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mongodb.ssl.CAFile='
+    line: 'mongodb.ssl.CAFile={{ mdb_cert_root_ca }}'
+    state: present
+
+- name: Modify mongodb.ssl.PEMKeyFile
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mongodb.ssl.PEMKeyFile='
+    line: 'mongodb.ssl.PEMKeyFile={{ mdb_cert_server_ca }}'
+    state: present
+
+- name: Modify mms.ignoreInitialUiSetup
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.ignoreInitialUiSetup='
+    line: 'mms.ignoreInitialUiSetup={{ conf_mms_properties_mms_ignoreInitialUiSetup }}'
+    state: present
+
+- name: Modify mms.centralUrl
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.centralUrl='
+    line: 'mms.centralUrl=https://{{ inventory_hostname }}:{{ mms_conf_base_ssl_port }}'
+    state: present
+
+- name: Modify mms.https.CAFile
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.https.CAFile='
+    line: 'mms.https.CAFile={{ mdb_cert_root_ca }}'
+    state: present
+
+- name: Modify mms.https.PEMKeyFile
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.https.PEMKeyFile='
+    line: 'mms.https.PEMKeyFile={{ mdb_cert_server_ca }}'
+    state: present
+
+- name: Modify mms.https.ClientCertificateMode
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.https.ClientCertificateMode='
+    line: 'mms.https.ClientCertificateMode={{ conf_mms_properties_mms_https_ClientCertificateMode }}'
+    state: present
+
+- name: Modify mms.publicApi.whitelistEnabled
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.publicApi.whitelistEnabled='
+    line: 'mms.publicApi.whitelistEnabled={{ conf_mms_properties_mms_publicApi_whitelistEnabled }}'
+    state: present
+
+- name: Modify mms.adminEmailAddr
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.adminEmailAddr='
+    line: 'mms.adminEmailAddr={{ conf_mms_properties_mms_adminEmailAddr }}'
+    state: present
+
+- name: Modify mms.fromEmailAddr
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.fromEmailAddr='
+    line: 'mms.fromEmailAddr={{ conf_mms_properties_mms_fromEmailAddr }}'
+    state: present
+
+- name: Modify mms.replyToEmailAddr
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.replyToEmailAddr='
+    line: 'mms.replyToEmailAddr={{ conf_mms_properties_mms_replyToEmailAddr }}'
+    state: present
+
+- name: Modify mms.mail.hostname
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.mail.hostname='
+    line: 'mms.mail.hostname={{ conf_mms_properties_mms_mail_hostname }}'
+    state: present
+
+- name: Modify mms.mail.port
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.mail.port='
+    line: 'mms.mail.port={{ conf_mms_properties_mms_mail_port }}'
+    state: present
+
+- name: Modify mms.mail.transport
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^mms.mail.transport='
+    line: 'mms.mail.transport={{ conf_mms_properties_mms_mail_transport }}'
+    state: present
+
+- name: Modify automation.versions.source
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: '^automation.versions.source='
+    line: 'automation.versions.source={{ conf_mms_properties_automation_versions_source }}'
+    state: present

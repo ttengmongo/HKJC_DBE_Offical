@@ -1,0 +1,21 @@
+
+
+- name: Wait for automation status to be updated
+  uri:
+    url: "https://{{ ansible_fqdn }}:{{ops_manager_port}}/api/public/v1.0/groups/{{ project_id }}/automationStatus"
+    method: GET
+    validate_certs: false
+    return_content: true
+    user: "{{ auth_username }}"
+    password: "{{ auth_password }}"
+    headers:
+      Accept: "application/json"
+  register: automation_status
+
+- name: Debug automation status
+  debug:
+    var: automation_status
+
+- name: Wait for 10 seconds
+  pause:
+    seconds: 10

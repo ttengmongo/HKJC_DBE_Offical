@@ -1,0 +1,23 @@
+# cert_server_vars
+#cert_server: 'ec2-54-76-138-135.eu-west-1.compute.amazonaws.com'
+cert_server: 'ec2-3-250-79-119.eu-west-1.compute.amazonaws.com'
+cert_path: '/backup/mongodb_installation/binary/'
+cert_name: 'server.pfx'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no ted@'
+scp_password: 'QWER:1234'
+
+# server_cert_vars
+server_cert_remote_dest: '/backup/mongodb_cert/'
+server_cert_remote_name: 'newServerCert.pfx'
+server_cert_pfx_pass: '123123'
+server_cert_installation_path: '/etc/ssl/mongodb/'
+server_cert_remote_owner: 'mongod'
+server_cert_remote_group: 'mongod'
+server_cert_remote_mode: '0750'
+ops_server_cert_remote_owner: 'mongod'
+ops_server_cert_remote_group: 'mongodb-mms'
+ca_cert_remote_symbolic_name: 'mongodb_rootCA.pem'
+server_cert_remote_symbolic_name: 'mongodb_server.pem'
+cert_remote_backup_folder: '/etc/ssl/mongodb/old_server_certificate/'
+ops_manager_instances:
+  - mongod

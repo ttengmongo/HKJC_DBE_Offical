@@ -1,0 +1,52 @@
+---
+- name: Set var filtered_shard_groups
+  set_fact:
+    filtered_shard_groups: "{{ groups.keys() | select('match', '^sharded-cluster-shard-\\d+$') }}"
+
+- name: Print filtered_shard_groups
+  debug:
+    var: filtered_shard_groups
+
+- name: Set var num_of_shards
+  set_fact:
+    num_of_shards: "{{ filtered_shard_groups | map('regex_replace', '^.*?(\\d+)$', '\\1') | map('int') | max + 1}}"
+
+- name: Print var num_of_shards
+  debug:
+    var: num_of_shards
+
+- name: Generate sharding json
+  template:
+    src: sharding.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/sharding.json"
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Generate sharding_shards_0 json
+  template:
+    src: sharding.shards.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/sharding_shards_{{ shard_name_prefix }}_{{ index }}.json"
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ range(num_of_shards | int) | list }}"
+  loop_control:
+    index_var: index
+
+- name: Merged into sharding by jq
+  shell: |
+    jq '.shards += [inputs]' {{ ops_mgr_api_tmp_path }}/sharding.json {{ ops_mgr_api_tmp_path }}/sharding_shards_{{ shard_name_prefix }}_*.json \
+    > {{ ops_mgr_api_tmp_path }}/merged_sharding.json
+  register: merged_sharding_result
+
+- name: Print merged_sharding_result
+  debug:
+    var: merged_sharding_result
+
+- name: Change ownership for {{ ops_mgr_api_tmp_path }}/merged_sharding.json
+  file:
+    path: "{{ ops_mgr_api_tmp_path }}/merged_sharding.json"
+    mode: '0755'
+    owner: root
+    group: root

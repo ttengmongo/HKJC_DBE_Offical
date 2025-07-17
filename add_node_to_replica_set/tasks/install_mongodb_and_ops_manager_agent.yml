@@ -1,0 +1,73 @@
+---
+- name: Install new MongoDB version
+  zypper:
+    name: '{{ binary_path }}{{ mongodb_binary_name }}'
+    disable_gpg_check: yes
+    state: present
+  register: install_result
+  changed_when: install_result.changed == True
+
+- name: Display the install result
+  debug:
+    msg: "Install result: {{ install_result }}"
+
+- name: Check current installation
+  command:
+    cmd: zypper search -i -s mongodb-enterprise-server
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"
+
+- name: Download Ops Manager Agent RPM
+  get_url:
+    url: 'https://{{ source_host }}:{{ source_ops_manager_port}}/download/agent/automation/{{ source_ops_manager_agent_name }}'
+    dest: '{{ binary_path }}{{ source_ops_manager_agent_name }}'
+    validate_certs: false
+  register: download_result
+  changed_when: download_result.changed == True
+
+- name: Display the download result
+  debug:
+    msg: "Download result: {{ download_result }}"
+
+- name: Install Ops Manager Agent RPM
+  zypper:
+    name: '{{ binary_path }}{{ source_ops_manager_agent_name }}'
+    disable_gpg_check: yes
+    state: present
+  register: install_result
+
+- name: Check current installation
+  command:
+    cmd: zypper search -i -s mongodb-mms
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"
+
+- name: Copy automation-agent.config to /etc/mongodb-mms/
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mongod
+    group: mongod
+    mode: '0644'
+    remote_src: true
+  loop:
+    - { src: "{{ scp_dest_folder }}/automation-agent.config", dest: "/etc/mongodb-mms/automation-agent.config" }
+
+- name: Copy MongoDB systemd service file to /usr/lib/systemd/system/
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+    remote_src: true
+  loop:
+    - { src: "{{ scp_dest_folder }}mongod.service", dest: "/usr/lib/systemd/system/mongod.service" }

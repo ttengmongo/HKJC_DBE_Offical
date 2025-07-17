@@ -1,0 +1,17 @@
+## <Replace to Your Project ID>
+project_id: "684fc2eff0acac4c5ab425cc"
+
+## <Replace to Your Project API Public Key>
+project_api_public_key: "nxcthqhg"
+
+## <Replace to Your Project API Private Key>
+project_api_private_key: "dedbf84a-7ffd-4263-846e-92ceef7c42e3"
+
+## <Replace to Your Cluster Name, and don't be duplicated in the same project>
+cluster_name: "rs-blockstore"
+
+## <Replace to Your Username for scp>
+scp_source_user: "jiacy"
+
+## <Replace to Your Password for scp>
+scp_source_pwd: "123456"

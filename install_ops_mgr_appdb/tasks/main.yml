@@ -1,0 +1,45 @@
+---
+- import_tasks: install_rpm_appdb.yml
+  tags: install_rpm_appdb
+
+- import_tasks: install_rpm_mongosh.yml
+  tags: install_rpm_mongosh
+
+- import_tasks: install_rpm_mdb_tools.yml
+  tags: install_rpm_mdb_tools
+
+- import_tasks: prepare_dir.yml
+  tags: prepare_dir
+
+- import_tasks: generate_keyfile_for_appdb.yml
+  tags: generate_keyfile_for_appdb
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: scp_keyfile_for_appdb.yml
+  tags: scp_keyfile_for_appdb
+  when: inventory_hostname in play_hosts and inventory_hostname != play_hosts[0]
+
+- import_tasks: create_mongod_conf.yml
+  tags: create_mongod_conf
+
+- import_tasks: modify_mongod_service.yml
+  tags: modify_mongod_service
+
+- import_tasks: start_mongod_service.yml
+  tags: start_mongod_service
+
+- import_tasks: get_hostname_list.yml
+  tags: get_hostname_list
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: initiate_appdb.yml
+  tags: initiate_appdb
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: create_first_db_account.yml
+  tags: create_first_db_account
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: create_non_first_db_account.yml
+  tags: create_non_first_db_account
+  when: inventory_hostname == play_hosts[0]

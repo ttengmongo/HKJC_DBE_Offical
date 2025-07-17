@@ -1,0 +1,11 @@
+## <Replace to Your Project ID>
+project_id: '682eed117d5ae06776219973'
+
+## <Replace to Your Project API Public Key>
+project_api_public_key: "iwvdaitt"
+
+## <Replace to Your Project API Private Key>
+project_api_private_key: "e711acbf-534c-45ee-92bd-7f074ee4aa9c"
+
+## <Replace to Your Cluster Name>
+cluster_name: "replicaset-cluster"

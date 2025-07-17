@@ -1,0 +1,44 @@
+- name: Create backup directory
+  file:
+    path: '{{ backup_path }}'
+    state: directory
+    mode: "0655"
+  register: backup_dir
+
+- name: Display backup directory
+  debug:
+    msg: "Backup directory: {{ backup_dir }}"
+
+- name: Stop Ops Manager
+  systemd:
+    name: mongodb-mms
+    state: stopped
+  register: stop_result
+
+- name: Display mongodb-mms.service stop result
+  debug:
+    msg: "Stop result: {{ stop_result }}"
+
+- name: Stop Ops Manager Backup Daemon
+  systemd:
+    name: mongodb-mms-backup-daemon
+    state: stopped
+  register: stop_result
+
+- name: Display the mongodb-mms-backup-daemon stop result
+  debug:
+    msg: "Stop result: {{ stop_result }}"
+
+- name: Copy Ops Manager Config file to backup
+  copy:
+    src: /opt/mongodb/mms/conf
+    dest: '{{ backup_path }}'
+    remote_src: yes
+    mode: "0655"
+
+- name: Copy Ops Manager Config Key file to backup
+  copy:
+    src: /etc/mongodb-mms/gen.key
+    dest: '{{ backup_path }}'
+    remote_src: yes
+    mode: "0655"

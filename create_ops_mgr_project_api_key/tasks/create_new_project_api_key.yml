@@ -1,0 +1,41 @@
+---
+- name: Create One Project API Key
+  uri:
+    url: "{{ ops_mgr_api_endpoint_create_project_api_key }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: POST
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body_format: json
+    body: |
+      {
+        "desc": "{{ create_project_api_key_param_desc }}",
+        "roles": {{ create_project_api_key_param_roles }}
+      }
+    status_code: 200
+    validate_certs: false
+  register: create_project_api_key_response
+
+- name: Print create_project_api_key_response
+  debug:
+    var: create_project_api_key_response
+
+- name: Define project_public_key, project_private_key
+  set_fact:
+    project_public_key: "{{ create_project_api_key_response.json.publicKey }}"
+    project_private_key: "{{ create_project_api_key_response.json.privateKey }}"
+
+- name: Write project_id, project_public_key, project_private_key into the file {{ ops_mgr_api_tmp_path }}/{{ ops_mgr_project_api_key_json }}
+  copy:
+    content: '{"project_id": "{{ project_id }}", "public_key": "{{ project_public_key }}", "private_key": "{{ project_private_key }}"}'
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ ops_mgr_project_api_key_json }}"
+    mode: '0644'
+    owner: root
+    group: root
+  register: write_into_file_result
+
+- name: Print write_into_file_result
+  debug:
+    var: write_into_file_result

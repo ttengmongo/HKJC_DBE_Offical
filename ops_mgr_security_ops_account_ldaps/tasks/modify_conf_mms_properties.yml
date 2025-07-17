@@ -1,0 +1,71 @@
+---
+- name: Modify mms.userSvcClass
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.userSvcClass="
+    line: "mms.userSvcClass={{ mms_userSvcClass }}"
+    state: present
+    backup: yes
+
+- name: Modify mms.ldap.url
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.url="
+    line: "mms.ldap.url={{ mms_ldap_url }}"
+    state: present
+
+- name: Modify mms.ldap.bindDn
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.bindDn="
+    line: "mms.ldap.bindDn={{ mms_ldap_bindDn }}"
+    state: present
+
+- name: Modify mms.ldap.bindPassword
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.bindPassword="
+    line: "mms.ldap.bindPassword={{ mms_ldap_bindPassword }}"
+    state: present
+
+- name: Modify mms.ldap.user.baseDn
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.user.baseDn="
+    line: "mms.ldap.user.baseDn={{ mms_ldap_user_baseDn }}"
+    state: present
+
+- name: Modify mms.ldap.group.baseDn
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.group.baseDn="
+    line: "mms.ldap.group.baseDn={{ mms_ldap_group_baseDn }}"
+    state: present
+
+- name: Modify mms.ldap.user.searchAttribute
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.user.searchAttribute="
+    line: "mms.ldap.user.searchAttribute={{ mms_ldap_user_searchAttribute }}"
+    state: present
+
+- name: Modify mms.ldap.group.member
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.group.member="
+    line: "mms.ldap.group.member={{ mms_ldap_group_member }}"
+    state: present
+
+- name: Modify mms.ldap.global.role.owner
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.global.role.owner="
+    line: "mms.ldap.global.role.owner={{ mms_ldap_global_role_owner }}"
+    state: present
+
+- name: Modify mms.ldap.referral
+  lineinfile:
+    path: "{{ conf_mms_properties }}"
+    regexp: "^mms.ldap.referral="
+    line: "mms.ldap.referral={{ mms_ldap_referral }}"
+    state: present

@@ -1,0 +1,8 @@
+---
+- name: Create dir {{ mms_cluster_path }}
+  file:
+    path: '{{ ops_mgr_backup_head_dir }}'
+    state: directory
+    mode: '0755'
+    owner: "mongodb-mms"
+    group: "mongodb-mms"

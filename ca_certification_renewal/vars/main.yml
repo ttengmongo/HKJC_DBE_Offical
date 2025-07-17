@@ -1,0 +1,16 @@
+# cert_server_vars
+cert_server: 'ec2-54-76-138-135.eu-west-1.compute.amazonaws.com'
+cert_path: '/backup/mongodb_installation/binary/'
+cert_name: 'ca.pfx'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no ted@'
+scp_password: 'QWER:1234'
+
+# ca_cert_vars
+ca_cert_remote_dest: '/backup/mongodb_cert/'
+ca_cert_remote_pfx_name: 'hkjc_odps_ca_test.pfx'
+ca_cert_pfx_pass: '123123'
+ca_cert_remote_name: 'hkjc_odps_ca.pem'
+ca_cert_remote_owner: 'mongod'
+ca_cert_remote_group: 'mongod'
+ca_cert_remote_mode: '0755'
+ca_cert_remote_backup_folder: '/etc/ssl/old_ca_certificate/'

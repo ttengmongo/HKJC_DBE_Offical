@@ -1,0 +1,28 @@
+---
+- name: Define remote_host
+  set_fact:
+    remote_host: "{{ groups['ops-mgr-blockstore'][0] }}"
+
+- name: Print vars remote_host
+  debug:
+    msg: '{{ remote_host }}'
+
+- name: Set vars for instance_index, instance_sequence
+  set_fact:
+    instance_index: "{{ ansible_play_hosts_all.index(inventory_hostname) }}"
+    instance_sequence: "{{ ansible_play_hosts_all.index(inventory_hostname) + 1 }}"
+
+- name: Print instance_index, instance_sequence
+  debug:
+    msg: "{{ ansible_fqdn }}, {{ instance_index }}, {{ instance_sequence }}"
+
+- name: Scp project updated json for automation from local to remote
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ ops_mgr_api_tmp_path }}/{{ processes_element_json }} {{ scp_source_user }}@{{ remote_host }}:{{ ops_mgr_api_tmp_path }}/
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  args:
+    executable: /usr/bin/expect

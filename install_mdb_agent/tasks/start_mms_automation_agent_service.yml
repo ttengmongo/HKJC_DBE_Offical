@@ -1,0 +1,17 @@
+---
+- name: Restart mongodb-mms-automation-agent.service
+  systemd:
+    name: mongodb-mms-automation-agent
+    state: restarted
+    enabled: true
+
+- name: Check status for mongodb-mms-automation-agent.service
+  command: systemctl is-active mongodb-mms-automation-agent
+  register: command_result
+  retries: 3
+  delay: 5
+  until: command_result.rc == 0
+
+- name: Print command_result
+  debug:
+    msg: "{{ command_result }}"

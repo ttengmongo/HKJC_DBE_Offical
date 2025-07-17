@@ -1,0 +1,23 @@
+---
+- name: Create mongodb-mms group
+  group:
+    name: mongodb-mms
+    gid: 999
+  register: mongodb_mms_group
+
+- name: Display mongodb-mms group result
+  debug:
+    msg: "mongodb-mms group created with GID {{ mongodb_mms_group.gid }}"
+
+- name: Create mongodb-mms user
+  user:
+    name: mongodb-mms
+    comment: "mongodb-mms"
+    uid: 999
+    group: mongodb-mms
+    shell: /usr/sbin/nologin
+  register: mongodb_mms_user
+
+- name: Display mongodb-mms user result
+  debug:
+    msg: "mongodb-mms user created with UID {{ mongodb_mms_user.uid }}"

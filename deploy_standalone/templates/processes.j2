@@ -1,0 +1,55 @@
+{
+    "args2_6": {
+        "auditLog": {
+		    "destination": "{{ args2_6_auditLog_destination }}",
+            "filter": "{{ args2_6_auditLog_filter }}"
+        },
+        "net": {
+            "bindIp": "{{ args2_6_net_bindIp }}",
+            "port": {{ args2_6_net_port }},
+            "tls": {
+                "certificateKeyFile": "{{ args2_6_net_tls_certificateKeyFile }}",
+                "disabledProtocols": "{{ args2_6_net_tls_disabledProtocols }}",
+                "mode": "{{ args2_6_net_tls_mode }}"
+            }
+        },
+        "security": {
+            "enableEncryption": {{ args2_6_security_enableEncryption | lower}},
+            "encryptionKeyFile": "{{ args2_6_security_encryptionKeyFile}}",
+            "javascriptEnabled": {{ args2_6_security_javascriptEnabled | lower}}
+        },
+        "setParameter": {
+            "auditAuthorizationSuccess": "{{ args2_6_setParameter_auditAuthorizationSuccess }}"
+        },
+        "storage": {
+            "dbPath": "{{ args2_6_storage_dbPath }}",
+            "wiredTiger": {
+                "collectionConfig": {},
+                "engineConfig": {
+                    "cacheSizeGB": {{ args2_6_storage_wiredTiger_engineConfig_cacheSizeGB }}
+                },
+                "indexConfig": {}
+            }
+        },
+        "systemLog": {
+            "destination": "{{ args2_6_systemLog_destination }}",
+            "logAppend": {{ args2_6_systemLog_logAppend | lower}},
+            "path": "{{ args2_6_systemLog_path }}"
+        }
+    },
+    "authSchemaVersion": {{ instance_authSchemaVersion }},
+    "disabled": {{ instance_disabled | lower}},
+    "featureCompatibilityVersion": "{{ instance_featureCompatibilityVersion }}",
+    "hostname": "{{ instance_hostname }}",
+    "kerberos": {
+        "keytab": "{{ instance_kerberos_keytab }}"
+    },
+    "logRotate": {
+        "sizeThresholdMB": {{ instance_logRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ instance_logRotate_timeThresholdHrs }}
+    },
+    "manualMode": {{ instance_manualMode | lower}},
+    "name": "{{ instance_name }}",
+    "processType": "{{ instance_processType }}",
+    "version": "{{ instance_version }}"
+}

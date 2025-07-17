@@ -1,0 +1,17 @@
+---
+- name: Copy .tgz file to the path {{ mms_releases_path }}
+  shell: "cp {{ install_binary_path }}/*.tgz {{ mms_releases_path }}"
+
+- name: Change ownership of {{ mms_releases_path }}
+  file:
+    path: "{{ mms_releases_path }}"
+    recurse: yes
+    owner: mongodb-mms
+    group: mongodb-mms
+
+- name: Change ownership of {{ mms_gen_key_path }}
+  file:
+    path: "{{ mms_gen_key_path }}"
+    recurse: yes
+    owner: mongodb-mms
+    group: mongodb-mms

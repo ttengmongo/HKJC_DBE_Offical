@@ -1,0 +1,40 @@
+---
+- name: Check current installation
+  command:
+    cmd: zypper search -i -s mongodb-mms
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"
+
+- name: Install OpsManager new version
+  zypper:
+#    name: "{{ package_info[version]['packages_list'] |map('regex_replace', '^(.+)$', '%s/\\1' % binary_path) |list }}"
+    name: '{{ binary_path }}{{ binary_name }}'
+    disable_gpg_check: yes
+    state: present
+  register: install_result
+  changed_when: install_result.changed == True
+
+- name: Display the install result var
+  debug:
+    var: install_result
+
+- name: Display the install result
+  when: install_result.stdout is defined
+  debug:
+    msg: "Install result: {{ install_result.stdout }}"
+
+- name: Check current installation
+  command:
+    cmd: zypper search -i -s mongodb-mms
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"
+
+

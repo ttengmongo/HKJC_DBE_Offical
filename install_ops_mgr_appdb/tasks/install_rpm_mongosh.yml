@@ -1,0 +1,30 @@
+---
+- name: Check if MongoShell RPM package is installed
+  command:
+    cmd: rpm -q {{ mdb_mongosh_pkg }}
+  register: result_check_pkg
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Install MongoShell RPM package
+  command:
+    cmd: rpm -Uvh '{{ install_binary_path }}/{{ mdb_mongosh_pkg }}-{{ mdb_mongosh_version }}.rpm'
+  register: result_install_pkg
+  when:
+    - result_check_pkg is defined
+    - result_check_pkg.rc != 0
+
+- name: Check MongoShell RPM package installation result (Success)
+  debug:
+    msg: "Success: Install MongoShell package"
+  when:
+    - result_install_pkg.rc is defined
+    - result_install_pkg.rc == 0
+
+- name: Check MongoShell RPM package installation result (Failed)
+  debug:
+    msg: "Failed: Install MongoShell package"
+  when:
+    - result_install_pkg.rc is defined
+    - result_install_pkg.rc != 0

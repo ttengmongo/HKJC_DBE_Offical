@@ -1,0 +1,39 @@
+---
+- import_tasks: clear_history_json.yml
+  tags: clear_history_json
+
+- import_tasks: install_jq.yml
+  tags: install_jq
+
+- import_tasks: prepare_cluster_dir.yml
+  tags: prepare_cluster_dir
+
+- import_tasks: config_mdb_clusters_tls.yml
+  tags: config_mdb_clusters_tls
+
+- import_tasks: config_mdb_clusters_authenticate.yml
+  tags: config_mdb_clusters_authenticate
+
+- import_tasks: config_mdb_agent_authenticate.yml
+  tags: config_mdb_agent_authenticate
+
+- import_tasks: config_mdb_agent_tls.yml
+  tags: config_mdb_agent_tls
+
+- import_tasks: create_automation_internal_user.yml
+  tags: create_automation_internal_user
+
+- import_tasks: create_project_processes_json.yml
+  tags: create_project_processes_json
+
+- import_tasks: create_project_roles_json.yml
+  tags: create_project_roles_json
+
+- import_tasks: deploy_cluster.yml
+  tags: deploy_cluster
+
+- import_tasks: create_soft_link_mongod_conf.yml
+  tags: create_soft_link_mongod_conf
+
+- import_tasks: create_cluster_user.yml
+  tags: create_cluster_user

@@ -1,0 +1,11 @@
+---
+- import_tasks: modify_conf_mms_properties.yml
+  tags: modify_conf_mms_properties
+
+- import_tasks: restart_first_mms_service.yml.yml
+  tags: restart_first_mms_service
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: restart_others_mms_service.yml
+  tags: restart_others_mms_service
+  when: inventory_hostname in groups['ops-mgr-application'] and inventory_hostname != groups['ops-mgr-application'][0]

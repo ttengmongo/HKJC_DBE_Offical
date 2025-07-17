@@ -1,0 +1,65 @@
+{
+    "args2_6": {
+        "auditLog": {
+		    "destination": "{{ configsvr_args2_6_auditLog_destination }}",
+            "filter": "{{ configsvr_args2_6_auditLog_filter }}"
+        },
+        "net": {
+            "bindIp": "{{ configsvr_args2_6_net_bindIp }}",
+            "port": {{ configsvr_args2_6_net_port }},
+            "tls": {
+                "certificateKeyFile": "{{ configsvr_args2_6_net_tls_certificateKeyFile }}",
+                "disabledProtocols": "{{ configsvr_args2_6_net_tls_disabledProtocols }}",
+                "mode": "{{ configsvr_args2_6_net_tls_mode }}"
+            }
+        },
+        "replication": {
+            "replSetName": "{{ configsvr_args2_6_replication_replSetName }}"
+        },
+        "security": {
+            "enableEncryption": {{ configsvr_args2_6_security_enableEncryption | lower}},
+            "encryptionKeyFile": "{{ configsvr_args2_6_security_encryptionKeyFile}}",
+            "javascriptEnabled": {{ configsvr_args2_6_security_javascriptEnabled | lower}}
+        },
+        "sharding": {
+            "clusterRole": "{{ configsvr_args2_6_sharding_clusterRole }}"
+        },
+        "setParameter": {
+            "auditAuthorizationSuccess": "{{ configsvr_args2_6_setParameter_auditAuthorizationSuccess }}"
+        },
+        "storage": {
+            "dbPath": "{{ configsvr_args2_6_storage_dbPath }}",
+            "wiredTiger": {
+                "collectionConfig": {},
+                "engineConfig": {
+                    "cacheSizeGB": {{ configsvr_args2_6_storage_wiredTiger_engineConfig_cacheSizeGB }}
+                },
+                "indexConfig": {}
+            }
+        },
+        "systemLog": {
+            "destination": "{{ configsvr_args2_6_systemLog_destination }}",
+            "logAppend": {{ configsvr_args2_6_systemLog_logAppend | lower}},
+            "path": "{{ configsvr_args2_6_systemLog_path }}"
+        }
+    },
+    "auditLogRotate": {
+        "sizeThresholdMB": {{ configsvr_instance_auditLogRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ configsvr_instance_auditLogRotate_timeThresholdHrs }}
+    },
+    "authSchemaVersion": {{ configsvr_instance_authSchemaVersion }},
+    "disabled": {{ configsvr_instance_disabled | lower}},
+    "featureCompatibilityVersion": "{{ configsvr_instance_featureCompatibilityVersion }}",
+    "hostname": "{{ configsvr_instance_hostname }}",
+    "kerberos": {
+        "keytab": "{{ configsvr_instance_kerberos_keytab }}"
+    },
+    "logRotate": {
+        "sizeThresholdMB": {{ configsvr_instance_logRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ configsvr_instance_logRotate_timeThresholdHrs }}
+    },
+    "manualMode": {{ configsvr_instance_manualMode | lower}},
+    "name": "{{ configsvr_instance_name }}",
+    "processType": "{{ configsvr_instance_processType }}",
+    "version": "{{ configsvr_instance_version }}"
+}

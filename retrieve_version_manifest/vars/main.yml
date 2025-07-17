@@ -1,0 +1,9 @@
+ops_mgr_app_port: 8132
+ops_mgr_app_server: "{{ groups['ops-mgr-application'][0] }}"
+
+scp_cmd: "spawn scp -oStrictHostKeyChecking=no"
+
+ops_mgr_api_tmp_path: /tmp/mongodb/ops_mgr_api
+
+ops_mgr_version_manifest_download_url: "https://opsmanager.mongodb.com/static/version_manifest/{{ ops_mgr_version }}.json"
+ops_mgr_version_manifest_json: "{{ ops_mgr_api_tmp_path }}/version_manifest.json"

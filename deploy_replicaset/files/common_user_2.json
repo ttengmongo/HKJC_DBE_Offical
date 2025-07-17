@@ -1,0 +1,21 @@
+{
+    "authenticationRestrictions": [],
+    "db": "admin",
+    "mechanisms": ["SCRAM-SHA-256"],
+    "roles": [
+        {
+            "db": "admin",
+            "role": "readWriteAnyDatabase"
+        },
+        {
+            "db": "admin",
+            "role": "dbAdminAnyDatabase"
+        },
+        {
+            "db": "admin",
+            "role": "clusterMonitor"
+        }
+    ],
+    "user": "mms",
+    "initPwd": "Mms_001"
+}

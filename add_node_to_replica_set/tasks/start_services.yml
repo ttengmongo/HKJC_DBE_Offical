@@ -1,0 +1,14 @@
+---
+- name: Start MongoDB services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    daemon_reload: true
+  loop:
+    - mongod
+    - mongodb-mms-automation-agent
+  register:  start_services_result
+
+- name: Display the start services result
+  debug:
+    msg: "Start services result: {{ start_services_result }}"

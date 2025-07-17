@@ -1,0 +1,40 @@
+---
+- name: Create data directory for AppDB
+  file:
+    path: "{{ appdb_data_path }}"
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create logs directory for AppDB
+  file:
+    path: "{{ appdb_log_path }}"
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Create keyfile directory if not exists
+  file:
+    path: "{{ keyfile_root_path }}"
+    state: directory
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Change ownership of /data directory
+  file:
+    path: /data
+    state: directory
+    recurse: yes
+    owner: mongod
+    group: mongod
+
+- name: Create temp directory for mongodb scp
+  file:
+    path: "{{ tmp_mongodb_scp }}"
+    state: directory
+    mode: '0777'
+    owner: root
+    group: root

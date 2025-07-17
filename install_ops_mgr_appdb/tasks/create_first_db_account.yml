@@ -1,0 +1,90 @@
+---
+- name: Calculate AppDB RS Success Status Code
+  set_fact:
+    appdb_rs_status_success_code: "{{ hostname_list | length | int * 2 - 1 }}"
+
+- name: Print appdb_rs_status_success_code
+  debug:
+    msg: "{{appdb_rs_status_success_code}}"
+
+- name: Check if existed the First User
+  command: >
+    mongosh
+      --host {{ hostname_list[0] }}
+      --port {{ appdb_port }}
+      --tls
+      --tlsCAFile {{ mdb_cert_root_ca }}
+      --authenticationDatabase admin
+      -u {{ first_db_account_name }}
+      -p {{ first_db_account_pwd }}
+      --eval '{{ mongosh_cmd_conn_status }}'
+  register: check_first_user
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Check AppDB Replica Set Status without First User
+  command: >
+    mongosh
+      --port {{ appdb_port }}
+      --tls
+      --tlsAllowInvalidCertificates
+      --eval 'rs.status().members.reduce((a,v) => a + v.state, 0)'
+  register: appdb_rs_status
+  when: check_first_user.rc != 0
+  failed_when: appdb_rs_status.stdout != appdb_rs_status_success_code
+  retries: 3
+  delay: 5
+
+- name: Check AppDB Replica Set Status with First User
+  command: >
+    mongosh
+      --host {{ hostname_list[0] }}
+      --port {{ appdb_port }}
+      --tls
+      --tlsCAFile {{ mdb_cert_root_ca }}
+      --authenticationDatabase admin
+      -u {{ first_db_account_name }}
+      -p {{ first_db_account_pwd }}
+      --eval 'rs.status().members.reduce((a,v) => a + v.state, 0)'
+  register: appdb_rs_status
+  when: check_first_user.rc == 0
+  failed_when: appdb_rs_status.stdout != appdb_rs_status_success_code
+  retries: 3
+  delay: 5
+
+- name: Sets of operations for creating the first user
+  block:
+    - name: Print First Account
+      debug:
+        msg: "{{ first_db_account }}"
+
+    - name: Create First DB Account
+      command: >
+        mongosh
+          --port {{ appdb_port }}
+          --tls
+          --tlsAllowInvalidCertificates
+          --eval 'use admin'
+          --eval 'db.createUser({{ first_db_account }})'
+      ignore_errors: true
+      failed_when: false
+      changed_when: false
+
+    - name: Check Login with the First Account
+      command: >
+        mongosh
+          --host {{ hostname_list[0] }}
+          --port {{ appdb_port }}
+          --tls
+          --tlsCAFile {{ mdb_cert_root_ca }}
+          --authenticationDatabase admin
+          -u {{ first_db_account_name }}
+          -p {{ first_db_account_pwd }}
+          --eval '{{ mongosh_cmd_conn_status }}'
+      register: check_login_result
+
+    - name: Print check_login_result
+      debug:
+        msg: "{{ check_login_result }}"
+  when: check_first_user.rc != 0

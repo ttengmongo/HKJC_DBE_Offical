@@ -1,0 +1,22 @@
+# main.yml
+---
+- import_tasks: install_mongosh.yml
+  tags: install_mongosh
+
+- import_tasks: copy_mongodb_config.yml
+  tags: copy_mongodb_config
+
+- import_tasks: install_mongodb_and_ops_manager_agent.yml
+  tags: install_db_agent
+
+- import_tasks: setup_permissions.yml
+  tags: setup_permissions
+
+- import_tasks: modify_mongod_config.yml
+  tags: modify_mongod_config
+
+- import_tasks: start_services.yml
+  tags: start_service
+
+- import_tasks: add_replica_set_members.yml
+  tags: add_replica_set_members

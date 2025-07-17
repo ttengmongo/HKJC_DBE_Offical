@@ -1,0 +1,43 @@
+---
+
+- name: Update version for processes
+  command:
+    cmd: >
+      jq '
+      .processes |= map(
+        if (.name | startswith("{{cluster_name}}_")) and .version == "{{current_mongodb_version}}" then
+          .version = "{{upgrade_mongodb_version}}" |
+          .featureCompatibilityVersion = "{{featureCompatibilityVersion}}"
+        else
+          .
+        end
+      )
+      ' /backup/mongodb_installation/binary/automationConfig.json
+  register: jq_result
+  changed_when: false
+
+- name: Display the result of jq command
+  debug:
+    var: jq_result
+
+- name: Check if the update was successful
+  ansible.builtin.fail:
+    msg: "Failed to update the version in automationConfig.json"
+  when: jq_result.rc != 0
+
+- name: Save jq_result.stdout_lines to a new automationConfig_updated.json
+  copy:
+    content: "{{ jq_result.stdout_lines | join('\n') }}"
+    dest: "{{ binary_path }}automationConfig_updated.json"
+    mode: "0644"
+
+- name: Fetch the updated content of automationConfig.json
+  command:
+    cmd: jq '.' "{{ binary_path }}automationConfig_updated.json"
+  register: automationConfig_update_json
+  changed_when: false
+
+- name: Display the updated content of automationConfig_updated.json
+  debug:
+      var: automationConfig_update_json.stdout_lines
+

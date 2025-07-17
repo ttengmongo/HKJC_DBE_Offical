@@ -1,0 +1,15 @@
+---
+- name: Modify BASE_PORT
+  lineinfile:
+    path: "{{ mms_conf }}"
+    regexp: '^BASE_PORT='
+    line: 'BASE_PORT={{ mms_conf_base_port }}'
+    state: present
+    backup: yes
+
+- name: Modify BASE_SSL_PORT
+  lineinfile:
+    path: "{{ mms_conf }}"
+    regexp: '^BASE_SSL_PORT='
+    line: 'BASE_SSL_PORT={{ mms_conf_base_ssl_port }}'
+    state: present

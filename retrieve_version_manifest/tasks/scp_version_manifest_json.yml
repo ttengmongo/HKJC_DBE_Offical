@@ -1,0 +1,19 @@
+---
+- name: Define remote_host
+  set_fact:
+    remote_host: "{{ ops_mgr_app_server }}"
+
+- name: Print remote_host
+  debug:
+    var: remote_host
+
+- name: Scp file {{ ops_mgr_version_manifest_json }} from local to remote
+  shell: |
+    set timeout 10
+    {{ scp_cmd }} {{ ops_mgr_version_manifest_json }} {{ scp_source_user }}@{{ remote_host }}:{{ ops_mgr_api_tmp_path }}/
+    expect "Password:"
+    send "{{ scp_source_pwd }}\r"
+    expect eof
+    exit 0
+  args:
+    executable: /usr/bin/expect

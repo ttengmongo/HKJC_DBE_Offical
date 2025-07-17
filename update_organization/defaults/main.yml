@@ -1,0 +1,5 @@
+## <Replace to Your Organization ID>
+ops_mgr_organization_id: "682c3f6f7d5ae067761a7ee2"
+
+## <Replace to Your New Organization Name>
+ops_mgr_organization_name_new: 'Ops Manager'

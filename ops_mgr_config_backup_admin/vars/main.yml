@@ -1,0 +1,31 @@
+ops_mgr_app_port: 8132
+ops_mgr_app_server: "{{ groups['ops-mgr-application'][0] }}"
+
+scp_cmd: "spawn scp -oStrictHostKeyChecking=no"
+
+ops_mgr_backup_head_dir: /data/headdb/
+ops_mgr_backup_head_dir_encode: "%2Fdata%2Fheaddb%2F"
+
+ops_mgr_api_tmp_path: /tmp/mongodb/ops_mgr_api
+ops_mgr_global_api_key_json: "ops_mgr_global_api_key.json"
+
+instance_hostname: "{{ ansible_hostname }}"
+
+blockstore_rs_name: rs-blockstore
+blockstore_port: 38232
+blockstore_auth_username: mms
+blockstore_auth_pwd: Mms_001
+
+ops_mgr_api_endpoint_base_url: "https://{{ ops_mgr_app_server }}:{{ ops_mgr_app_port }}/api/public/v1.0"
+ops_mgr_api_endpoint_backup_base_url: "{{ ops_mgr_api_endpoint_base_url }}/admin/backup"
+
+ops_mgr_api_endpoint_get_all_backup_daemon: "{{ ops_mgr_api_endpoint_backup_base_url }}/daemon/configs"
+ops_mgr_api_endpoint_get_one_backup_daemon: "{{ ops_mgr_api_endpoint_backup_base_url }}/daemon/configs/{{ instance_hostname }}"
+ops_mgr_api_endpoint_create_backup_daemon: "{{ ops_mgr_api_endpoint_backup_base_url }}/daemon/configs/{{ instance_hostname }}"
+ops_mgr_api_endpoint_update_backup_daemon: "{{ ops_mgr_api_endpoint_backup_base_url }}/daemon/configs/{{ instance_hostname }}"
+
+ops_mgr_api_endpoint_get_all_blockstore: "{{ ops_mgr_api_endpoint_backup_base_url }}/snapshot/mongoConfigs"
+ops_mgr_api_endpoint_create_blockstore: "{{ ops_mgr_api_endpoint_backup_base_url }}/snapshot/mongoConfigs"
+
+ops_mgr_api_endpoint_get_all_oplog: "{{ ops_mgr_api_endpoint_backup_base_url }}/oplog/mongoConfigs"
+ops_mgr_api_endpoint_create_oplog: "{{ ops_mgr_api_endpoint_backup_base_url }}/oplog/mongoConfigs"

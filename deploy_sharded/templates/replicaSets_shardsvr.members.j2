@@ -1,0 +1,10 @@
+{
+    "_id": {{ (instance_sequence | int - 1) % (num_of_nodes_per_shard | int) }},
+    "arbiterOnly": {{ shardsvr_replicaSets_members_arbiterOnly | lower }},
+    "buildIndexes": {{ shardsvr_replicaSets_members_buildIndexes | lower }},
+    "hidden": {{ shardsvr_replicaSets_members_hidden | lower}},
+    "host": "{{ shardsvr_replicaSets_members_host }}_{{ instance_sequence }}",
+    "priority": {{ shardsvr_replicaSets_members_priority }},
+    "secondaryDelaySecs": {{ shardsvr_replicaSets_members_secondaryDelaySecs }},
+    "votes": {{ shardsvr_replicaSets_members_votes }}
+}

@@ -1,0 +1,10 @@
+---
+- name: Install MDB Automation Agent RPM package
+  command: rpm -U {{ install_binary_path }}/{{ mms_automation_agent_rpm }}
+  register: install_agent_result
+  ignore_errors: true
+  failed_when: false
+
+- name: Print install_agent_result
+  debug:
+    msg: '{{ install_agent_result }}'

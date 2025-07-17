@@ -1,0 +1,23 @@
+---
+- name: Fetch automation status
+  uri:
+    url: "https://{{ansible_fqdn}}:{{ops_manager_port}}/api/public/v1.0/groups/{{ project_id }}/automationConfig?pretty=true"
+    method: GET
+    validate_certs: false
+    return_content: true
+    user: "{{ auth_username }}"
+    password: "{{ auth_password }}"
+    headers:
+      Accept: "application/json"
+  register: automationConfig
+
+- name: Display automation status
+  debug:
+    var: automationConfig
+
+
+- name: Save automation status to JSON file
+  copy:
+    content: '{{ automationConfig.content }}'
+    dest: "{{ binary_path }}automationConfig.json"
+    mode: "0644"

@@ -1,0 +1,12 @@
+---
+- import_tasks: stop_agent.yml
+  tags: stop_agent
+
+- import_tasks: backup.yml
+  tags: backup
+
+- import_tasks: upgrade_agent.yml
+  tags: upgrade_agent
+
+- import_tasks: restart_agent.yml
+  tags: restart_agent

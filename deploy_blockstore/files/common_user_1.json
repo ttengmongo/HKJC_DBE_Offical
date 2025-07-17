@@ -1,0 +1,33 @@
+{
+    "authenticationRestrictions": [],
+    "db": "admin",
+    "mechanisms": ["SCRAM-SHA-256"],
+    "roles": [
+        {
+            "db": "admin",
+            "role": "readWriteAnyDatabase"
+        },
+        {
+            "db": "admin",
+            "role": "dbAdminAnyDatabase"
+        },
+        {
+            "db": "admin",
+            "role": "userAdminAnyDatabase"
+        },
+        {
+            "db": "admin",
+            "role": "clusterAdmin"
+        },
+        {
+            "db": "admin",
+            "role": "backup"
+        },
+        {
+            "db": "admin",
+            "role": "restore"
+        }
+    ],
+    "user": "dbadmin",
+    "initPwd": "Dbadmin_001"
+}

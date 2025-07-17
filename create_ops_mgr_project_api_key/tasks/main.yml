@@ -1,0 +1,12 @@
+---
+- import_tasks: fetch_ops_mgr_api_keys.yml
+  tags: fetch_ops_mgr_api_keys
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: create_new_project_api_key.yml
+  tags: create_new_project_api_key
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: create_project_access_list.yml
+  tags: create_project_access_list
+  when: inventory_hostname == groups['ops-mgr-application'][0]

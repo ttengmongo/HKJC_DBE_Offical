@@ -1,0 +1,31 @@
+---
+- import_tasks: fetch_cert.yml
+  tags: fetch_cert
+
+- import_tasks: distribute_cert.yml
+  tags: distribute_cert
+
+- import_tasks: verify_cert.yml
+  tags: verify_cert
+
+- import_tasks: set_mongodb_mms_permission.yml
+  tags: set_mongodb_mms_permission
+  when: "'ops-mgr-application' in group_names"
+
+- import_tasks:  ops_manager_agent_restart.yml
+  tags: ops_manager_agent_restart
+
+- name: Ops Manager MongoDB Health Check
+  import_tasks: ops_manager_mongodb_health_check.yml
+  tags: ops_manager_mongodb_health_check
+  when: "'ops-mgr-appdb' in group_names"
+
+- name: Trigger data node restart
+  import_tasks: trigger_data_node_restart.yml
+  tags: trigger_data_node_restart
+  when: "'DATA-NODES' in group_names"
+
+- name: Ops Manager app service restart
+  import_tasks: ops_manager_app_restart.yml
+  tags: ops_manager_app_service_restart
+  when: "'ops-mgr-application' in group_names"

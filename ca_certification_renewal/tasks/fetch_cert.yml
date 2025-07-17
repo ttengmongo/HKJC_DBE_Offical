@@ -1,0 +1,24 @@
+---
+- name: Create CA cert directory
+  file:
+    path: '{{ ca_cert_remote_dest }}'
+    state: directory
+    mode: "0755"
+
+- name: Fetching ca cert from cert server
+  shell: |
+    set timeout 10
+    {{ scp_command }}{{ cert_server }}:{{ item.src }} {{ item.dest }}
+    expect "Password:"
+    send "{{ scp_password }}\r"
+    expect "*\]*#"
+    exit 0
+  args:
+    executable: /usr/bin/expect
+  loop:
+    - { src: '{{ cert_path }}{{ cert_name }}', dest: '{{ ca_cert_remote_dest }}{{ ca_cert_remote_pfx_name }}' }
+  register: copy_result
+
+- name: Display the fetch result
+  debug:
+    msg: "Copy result: {{ copy_result }}"

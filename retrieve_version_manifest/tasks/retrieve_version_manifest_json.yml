@@ -1,0 +1,37 @@
+---
+- name: Create dir {{ ops_mgr_api_tmp_path }}
+  file:
+    path: '{{ ops_mgr_api_tmp_path }}'
+    state: directory
+    mode: '0777'
+    owner: root
+    group: root
+
+- name: Retrieve the version manifest from MongoDB
+  uri:
+    url: "{{ ops_mgr_version_manifest_download_url }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    return_content: true
+    validate_certs: false
+  register: retrieve_version_manifect_response
+
+- name: Define version_manifest_content
+  set_fact:
+    version_manifest_content: "{{ retrieve_version_manifect_response.content }}"
+
+- name: Write into the file {{ ops_mgr_version_manifest_json }}
+  copy:
+    content: "{{ version_manifest_content }}"
+    dest: "{{ ops_mgr_version_manifest_json }}"
+    mode: '0755'
+    owner: root
+    group: root
+  register: write_version_manifest_json_result
+
+- name: Print write_version_manifest_json_result
+  debug:
+    var: write_version_manifest_json_result

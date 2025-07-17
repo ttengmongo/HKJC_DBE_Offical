@@ -1,0 +1,11 @@
+---
+- name: Download MDB Automation Agent RPM Package
+  get_url:
+    url: https://{{ ops_mgr_app_server }}:{{ ops_mgr_app_port }}/download/agent/automation/{{ mms_automation_agent_rpm }}
+    dest: "{{ install_binary_path }}"
+    validate_certs: false
+  register: download_mms_automation_agent_result
+
+- name: Print download_mms_automation_agent_result
+  debug:
+    msg: "{{ download_mms_automation_agent_result }}"

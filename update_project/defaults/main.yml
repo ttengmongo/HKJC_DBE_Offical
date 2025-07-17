@@ -1,0 +1,8 @@
+## <Replace to Your Organization ID>
+ops_mgr_organization_id: "682c3f6f7d5ae067761a7ee2"
+
+## <Replace to Your Project ID>
+ops_mgr_project_id: "682c44817d5ae067761a8391"
+
+## <Replace to Your New Project Name>
+ops_mgr_project_name_new: 'Blockstore'

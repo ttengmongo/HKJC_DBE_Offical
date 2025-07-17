@@ -1,0 +1,39 @@
+---
+- name: Restart mongodb-mms
+  systemd:
+    name: mongodb-mms
+    state: restarted
+
+- name: Wait for 120 seconds to ensure mongodb-mms is running
+  pause:
+    seconds: 120
+
+- name: Check if mongodb-mms_status is running
+  systemd:
+    name: mongodb-mms
+    state: started
+  register: mongodb_mms_status
+
+#    - name: Display mongodb-mms status
+#      debug:
+#        var: mongodb_mms_status
+
+- name: Display mongodb-mms status
+  debug:
+    msg: "mongodb-mms status is : {{ mongodb_mms_status.status.ActiveState }} and state time was : {{ mongodb_mms_status.status.ExecMainStartTimestamp }}"
+
+- name: Verify mongodb-mms  is running
+  fail:
+    msg: "mongodb-mms launch is failed"
+  when: mongodb_mms_status.status.ActiveState == 'failed'
+
+- name: Populate service facts
+  service_facts:
+
+- name: Print mongod and mongodb-mms service facts
+  debug:
+    msg:
+      - "mongod.service: {{ ansible_facts.services['mongod.service'] }}"
+      - "Mongodb-mms service: {{ ansible_facts.services['mongodb-mms.service'] }}"
+      - "Mongodb-mms: {{ ansible_facts.services['mongodb-mms'] }}"
+  ignore_errors: yes

@@ -1,0 +1,6 @@
+---
+- import_tasks: fetch_ops_mgr_api_keys.yml
+  tags: fetch_ops_mgr_api_keys
+
+- import_tasks: update_version_manifest_json.yml
+  tags: update_version_manifest_json

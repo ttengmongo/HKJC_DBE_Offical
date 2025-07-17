@@ -1,0 +1,22 @@
+---
+- name: Install new mongosh version
+  zypper:
+    name: '{{ binary_path }}{{ mongosh_binary_name }}'
+    state: present
+    disable_gpg_check: yes
+  register: install_result
+  changed_when: install_result.changed == True
+
+- name: Display the install result
+  debug:
+      msg: "Install result: {{ install_result }}"
+
+- name: Check current mongosh installation
+  command:
+    cmd: zypper search -i -s mongodb-mongosh
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"

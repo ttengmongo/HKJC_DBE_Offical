@@ -1,0 +1,26 @@
+---
+- name: Copy enable-transparent-huge-pages.service to systemd directory
+  copy:
+    src: ./enable-transparent-huge-pages.service
+    dest: /etc/systemd/system/enable-transparent-huge-pages.service
+    mode: '0644'
+
+- name: Start enable-transparent-huge-pages service
+  systemd:
+    name: enable-transparent-huge-pages
+    state: started
+  register: enable_thp_result
+
+- name: Display the enable-transparent-huge-pages service start result
+  debug:
+    msg: "Enable transparent huge pages service start result: {{ enable_thp_result.status }}"
+
+- name: Enable enable-transparent-huge-pages service
+  systemd:
+    name: enable-transparent-huge-pages
+    enabled: yes
+  register: enable_thp_result
+
+- name: Display the enable-transparent-huge-pages service enable result
+  debug:
+    msg: "Enable transparent huge pages service enable result: {{ enable_thp_result.status }}"

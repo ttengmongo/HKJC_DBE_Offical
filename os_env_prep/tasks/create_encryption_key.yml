@@ -1,0 +1,37 @@
+---
+- name: Generate encryption key
+  command: openssl rand -base64 32
+  register: encryption_key_result
+  run_once: true
+  changed_when: false
+
+- name: Display encryption key
+  debug:
+    msg: "Generated encryption key: {{ encryption_key_result.stdout }}"
+
+- name: Create a directory for the encryption key
+  file:
+    path: "{{ data_node_key_file_path }}"
+    state: directory
+    owner: mongod
+    group: mongod
+    mode: '0755'
+  register: create_key_dir_result
+  changed_when: create_key_dir_result.changed
+
+- name: Display create key directory result
+  debug:
+    msg: "Created key directory: {{ create_key_dir_result }}"
+
+- name: Save encryption key to file
+  copy:
+    content: "{{ encryption_key_result.stdout }}"
+    dest: '{{ data_node_key_file_path }}{{ data_node_key_file_name }}'
+    owner: mongod
+    group: mongod
+    mode: '0600'
+  register: save_key_result
+
+- name: Display save key result
+  debug:
+    msg: "Saved encryption key to file: {{ save_key_result }}"

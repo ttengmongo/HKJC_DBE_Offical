@@ -1,0 +1,21 @@
+# tasks/stop_db.yml
+---
+- name: Stop AppDB
+  systemd:
+    name: mongod
+    state: stopped
+  register: stop_appdb_result
+
+- name: Display the stop AppDB result
+  debug:
+    msg: "Stop result: {{ stop_appdb_result.status }}"
+
+#- name: Stop BlockstoreDB
+#  systemd:
+#    name: blockstore_mongod
+#    state: stopped
+#  register: stop_blockstore_db_result
+#
+#- name: Display the stop BlockstoreDB result
+#  debug:
+#    msg: "Stop result: {{ stop_blockstore_db_result.status }}"

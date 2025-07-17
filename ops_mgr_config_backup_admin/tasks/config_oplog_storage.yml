@@ -1,0 +1,71 @@
+---
+- name: Get All Oplog Configurations
+  uri:
+    url: "{{ ops_mgr_api_endpoint_get_all_oplog }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_all_oplog_response
+
+- name: Print get_all_oplog_response
+  debug:
+    var: get_all_oplog_response
+
+- name: Define blockstore_hostname_port
+  set_fact:
+    blockstore_hostname_port: "{{ hostname_list | map('regex_replace', '$', ':' + blockstore_port|string) | join(',') }}"
+
+- name: Print blockstore_hostname_port
+  debug:
+    var: blockstore_hostname_port
+
+- name: Generate oplog_config_id
+  shell: "openssl rand -hex 12"
+  register: generate_oplog_config_id_result
+
+- name: Define oplog_config_id
+  set_fact:
+    oplog_config_id: "{{ generate_oplog_config_id_result.stdout }}"
+
+- name: Print oplog_config_id
+  debug:
+    var: oplog_config_id
+
+- name: Define uri
+  set_fact:
+    uri: "mongodb://{{ blockstore_auth_username }}:{{ blockstore_auth_pwd }}@{{ blockstore_hostname_port }}/?replicaSet={{ blockstore_rs_name }}"
+
+- name: Print uri
+  debug:
+    var: uri
+
+- name: Create One Oplog Configuration
+  uri:
+    url: "{{ ops_mgr_api_endpoint_create_oplog }}"
+    user: "{{ global_owner_public_key }}"
+    password: "{{ global_owner_private_key }}"
+    method: POST
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body_format: json
+    body: |
+      {
+        "id" : "{{ oplog_config_id }}",
+        "assignmentEnabled" : true,
+        "encryptedCredentials" : false,
+        "uri" : "{{ uri }}",
+        "ssl" : true
+      }
+    status_code: 201
+    validate_certs: false
+  register: create_oplog_configuration_response
+
+- name: Print create_oplog_configuration_response
+  debug:
+    var: create_oplog_configuration_response

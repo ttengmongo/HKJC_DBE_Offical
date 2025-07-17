@@ -1,0 +1,15 @@
+app_db_port: 38132
+appsdbadmin_user: 'dbadmin'
+appsdbadmin_password: 'dbadmin'
+
+blockstore_db_port: 38232
+blkdbadmin_user: 'dbadmin'
+blkdbadmin_password: 'Dbadmin_001'
+
+data_db_port: 38232
+#data_dbadmin_user: 'ma_mgdb_svc@WIN.BETTING.HKJC.ORG.HK'
+
+ca_cert_path: '/etc/ssl/mongodb/mongodb_rootCA.pem'
+validation_command: 'db.adminCommand({ ping: 1 })'
+
+

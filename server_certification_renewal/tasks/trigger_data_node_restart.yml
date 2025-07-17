@@ -1,0 +1,40 @@
+---
+- name: Get mongod process ID
+  shell: "ps -ef | grep -v grep | grep mongod | grep automation-mongod.conf  | awk '{print $2}'"
+  register: mongod_pid
+  changed_when: false
+
+- name: Display mongod process ID
+  debug:
+    msg: "Mongod process ID is: {{ mongod_pid.stdout }}"
+
+- name: Kill mongod process
+  command: "kill {{ mongod_pid.stdout }}"
+  when: mongod_pid.stdout is defined
+  changed_when: true
+  register: kill_result
+
+- name: Display kill result
+  debug:
+    msg: "Kill result: {{ kill_result }}"
+  when: mongod_pid.stdout is defined
+
+#- name: Wait for 120 seconds to ensure mongod is running
+#  pause:
+#    seconds: 120
+
+- name: Wait for 30 seconds to ensure mongod is running
+  wait_for:
+    sleep: 30
+    path: /proc/{{ mongod_pid.stdout }}/status
+    state: absent
+    timeout: 60
+
+- name: Get new mongod process ID
+  shell: "ps -ef | grep -v grep | grep mongod | grep automation-mongod.conf  | awk '{print $2}'"
+  register: new_mongod_pid
+  changed_when: false
+
+- name: Display new mongod process ID
+  debug:
+    msg: "Mongod new process ID is: {{ new_mongod_pid.stdout }}"

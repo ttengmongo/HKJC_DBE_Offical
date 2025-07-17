@@ -1,0 +1,47 @@
+---
+- name: Create directories for appsdb
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ data_path }}logs"
+    - "{{ data_path }}data"
+
+- name: Set permissions for /data
+  file:
+    path: /data
+    state: directory
+    recurse: yes
+    mode: '0755'
+    owner: mongod
+    group: mongod
+
+- name: Set permissions for keyfiles
+  file:
+    path: "{{ item }}"
+    mode: '0600'
+    owner: mongod
+    group: mongod
+  loop:
+    - "{{ keyfile_path }}{{ keyfile_name }}"
+
+- name: Set permissions for mongo config
+  file:
+    path: "{{ item }}"
+    mode: '0644'
+    owner: mongod
+    group: mongod
+  loop:
+    - "/etc/mongod.conf"
+    - "{{ data_path }}mongod.conf"
+
+- name: Set permissions for ca / server cert
+  file:
+    path: "{{ item }}"
+    mode: '0750'
+    owner: mongod
+    group: mongod
+  loop:
+    - "{{ source_ssl_path }}{{ ca_pem_name }}"
+    - "{{ source_ssl_path }}{{ ansible_hostname }}.pem"

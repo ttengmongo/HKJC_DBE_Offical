@@ -1,0 +1,10 @@
+---
+- name: Install jq
+  zypper:
+    name: jq
+    state: present
+  register: install_jq_result
+
+- name: Print install_jq_result
+  debug:
+    var: install_jq_result

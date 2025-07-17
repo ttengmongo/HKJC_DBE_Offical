@@ -1,0 +1,11 @@
+# tasks/restart_db.yml
+---
+- name: Restart AppDB
+  systemd:
+    name: mongod
+    state: restarted
+  register: appdb_result
+
+- name: Display AppDB restart result
+  debug:
+    msg: "AppDB restart result: {{ appdb_result }}"

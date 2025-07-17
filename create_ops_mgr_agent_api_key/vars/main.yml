@@ -1,0 +1,10 @@
+ops_mgr_app_port: 8132
+ops_mgr_app_server: "{{ groups['ops-mgr-application'][0] }}"
+
+ops_mgr_api_tmp_path: /tmp/mongodb/ops_mgr_api
+ops_mgr_agent_api_key_json: "ops_mgr_agent_api_key.json"
+
+ops_mgr_api_endpoint_base_url: "https://{{ ops_mgr_app_server }}:{{ ops_mgr_app_port }}/api/public/v1.0"
+
+ops_mgr_api_endpoint_agentapikeys: "{{ ops_mgr_api_endpoint_base_url }}/groups/{{ project_id }}/agentapikeys"
+agentapikeys_param_desc: 'Create a new Agent API Key by the Ansible Script'

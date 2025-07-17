@@ -1,0 +1,161 @@
+---
+- name: Set var filtered_shard_groups
+  set_fact:
+    filtered_shard_groups: "{{ groups.keys() | select('match', '^sharded-cluster-shard-\\d+$') }}"
+
+- name: Print filtered_shard_groups
+  debug:
+    var: filtered_shard_groups
+
+- name: Set var num_of_shards, num_of_nodes_per_shard, num_of_nodes_configsvr
+  set_fact:
+    num_of_shards: "{{ filtered_shard_groups | map('regex_replace', '^.*?(\\d+)$', '\\1') | map('int') | max + 1}}"
+    num_of_nodes_per_shard: "{{ groups['sharded-cluster-shard-0'] | length}}"
+    num_of_nodes_configsvr: "{{ groups['sharded-cluster-config-server'] | length}}"
+    num_of_nodes_mongos: "{{ groups['sharded-cluster-mongos'] | length}}"
+
+- name: Print var num_of_shards, num_of_nodes_per_shard, num_of_nodes_configsvr, num_of_nodes_mongos
+  debug:
+    msg: "num_of_shards={{ num_of_shards }}, num_of_nodes_per_shard={{ num_of_nodes_per_shard }}, num_of_nodes_configsvr={{ num_of_nodes_configsvr }}, num_of_nodes_mongos={{ num_of_nodes_mongos }}"
+
+- name: Get the Automation Configuration for Deploying Sharded Cluster
+  uri:
+    url: "{{ ops_mgr_api_endpoint_automationConfig }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    status_code: 200
+    validate_certs: false
+  register: get_automation_configuration_response
+
+- name: Print get_automation_configuration_response
+  debug:
+    var: get_automation_configuration_response
+
+- name: Define current_automation_config_json
+  set_fact:
+    current_automation_config_json: "{{ get_automation_configuration_response.json }}"
+
+- name: Print current_automation_config_json
+  debug:
+    var: current_automation_config_json
+
+- name: Write into the file {{ ops_mgr_api_current_automation_config }}
+  copy:
+    content: "{{ current_automation_config_json }}"
+    dest: "{{ ops_mgr_api_current_automation_config }}"
+    mode: '0755'
+    owner: root
+    group: root
+  register: write_current_config_result
+
+- name: Print write_current_config_result
+  debug:
+    var: write_current_config_result
+
+- name: Upsert replicaSets_configsvr to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile replicaSets_configsvr {{ ops_mgr_api_tmp_path }}/merged_replicaSets_configsvr.json \
+    'del(.replicaSets[] | select(._id == "{{ config_server_replica_set_name }}")) | .replicaSets += [$replicaSets_configsvr]' {{ ops_mgr_api_current_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+
+- name: Upsert replicaSets_shardsvr to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile replicaSets_shardsvr {{ ops_mgr_api_tmp_path }}/merged_replicaSets_shardsvr_{{ shard_name_prefix }}_{{ index }}.json \
+    'del(.replicaSets[] | select(._id == "{{ shard_name_prefix }}_{{ index }}")) | .replicaSets += [$replicaSets_shardsvr]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  loop: "{{ range(num_of_shards | int) | list }}"
+  loop_control:
+    index_var: index
+
+
+- name: Upsert processes_shardsvr to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile processes_shardsvr_{{ shard_name_prefix }}_{{ item.0 }}_{{ item.0 * num_of_nodes_per_shard | int + (item.1 + 1) }} {{ ops_mgr_api_tmp_path }}/processes_shardsvr_{{ shard_name_prefix }}_{{ item.0 }}_{{ item.0 * num_of_nodes_per_shard | int + (item.1 + 1) }}.json \
+    'del(.processes[] | select(.name == "{{ cluster_name }}_{{ shard_name_prefix }}_{{ item.0 }}_{{ item.0 * num_of_nodes_per_shard | int + (item.1 + 1) }}")) | .processes += [$processes_shardsvr_{{ shard_name_prefix }}_{{ item.0 }}_{{ item.0 * num_of_nodes_per_shard | int + (item.1 + 1) }}]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  with_nested:
+    - "{{ range(num_of_shards | int) | list }}"
+    - "{{ range(num_of_nodes_per_shard | int) | list }}"
+
+- name: Upsert processes_configsvr to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile processes_configsvr_{{ index }} {{ ops_mgr_api_tmp_path }}/processes_configsvr_{{ num_of_shards | int * num_of_nodes_per_shard | int + index + 1 }}.json \
+    'del(.processes[] | select(.name == "{{ cluster_name }}_{{ config_server_replica_set_name }}_{{ num_of_shards | int * num_of_nodes_per_shard | int + index + 1 }}")) | .processes += [$processes_configsvr_{{ index }}]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  loop: "{{ range(num_of_nodes_configsvr | int) | list }}"
+  loop_control:
+    index_var: index
+
+- name: Upsert processes_mongos to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile processes_mongos_{{ index }} {{ ops_mgr_api_tmp_path }}/processes_mongos_{{ num_of_shards | int * num_of_nodes_per_shard | int + num_of_nodes_configsvr | int + index + 1 }}.json \
+    'del(.processes[] | select(.name == "{{ cluster_name }}_mongos_{{ num_of_shards | int * num_of_nodes_per_shard | int + num_of_nodes_configsvr | int + index + 1 }}")) | .processes += [$processes_mongos_{{ index }}]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+  loop: "{{ range(num_of_nodes_mongos | int) | list }}"
+  loop_control:
+    index_var: index
+
+- name: Upsert sharding to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile sharding {{ ops_mgr_api_tmp_path }}/merged_sharding.json \
+    'del(.sharding[] | select(.name == "{{ cluster_name }}")) | .sharding += [$sharding]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+
+- name: Upsert roles to the {{ ops_mgr_api_current_automation_config }} by jq
+  shell: |
+    jq --argfile roles {{ ops_mgr_api_tmp_path }}/roles.json \
+    'del(.roles[] | select(.role == "{{ role }}")) | .roles += [$roles]' {{ ops_mgr_api_updated_automation_config }} \
+    > {{ ops_mgr_api_temp_automation_config }} \
+    && mv {{ ops_mgr_api_temp_automation_config }} {{ ops_mgr_api_updated_automation_config }}
+
+- name: Change ownership for {{ ops_mgr_api_updated_automation_config }}
+  file:
+    path: "{{ ops_mgr_api_updated_automation_config }}"
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Read file from remote node into updated_automation_config
+  slurp:
+    src: "{{ ops_mgr_api_updated_automation_config }}"
+  register: updated_automation_config
+
+- name: Print updated_automation_config
+  debug:
+    msg: "{{ updated_automation_config.content | b64decode }}"
+
+- name: Define updated_automation_config_json
+  set_fact:
+    updated_automation_config_json: "{{ updated_automation_config.content | b64decode }}"
+
+- name: Print updated_automation_config_json
+  debug:
+    var: updated_automation_config_json
+
+- name: Update the Automation Configuration for Deploying Sharded Cluster
+  uri:
+    url: "{{ ops_mgr_api_endpoint_automationConfig }}"
+    user: "{{ project_api_public_key }}"
+    password: "{{ project_api_private_key }}"
+    method: PUT
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body: "{{ updated_automation_config_json | to_json }}"
+    status_code: 200
+    validate_certs: false
+  register: update_automation_configuration_response
+
+- name: Print update_automation_configuration_response
+  debug:
+    var: update_automation_configuration_response

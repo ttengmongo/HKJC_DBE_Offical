@@ -1,0 +1,201 @@
+ops_mgr_app_port: 8132
+ops_mgr_app_server: "{{ groups['ops-mgr-application'][0] }}"
+
+scp_cmd: "spawn scp -oStrictHostKeyChecking=no"
+
+automation_agent_config_httpsCAFile: /etc/ssl/mongodb/mongodb_rootCA.pem
+mdb_cert_server_ca: /etc/ssl/mongodb/mongodb_server.pem
+
+ops_mgr_api_endpoint_base_url: "https://{{ ops_mgr_app_server }}:{{ ops_mgr_app_port }}/api/public/v1.0"
+
+ops_mgr_api_endpoint_automationConfig: "{{ ops_mgr_api_endpoint_base_url }}/groups/{{ project_id }}/automationConfig"
+
+ops_mgr_api_tmp_path: /tmp/mongodb/ops_mgr_api
+ops_mgr_global_api_key_json: "ops_mgr_global_api_key.json"
+
+ops_mgr_api_current_automation_config: "{{ ops_mgr_api_tmp_path }}/current_automation_config.json"
+ops_mgr_api_updated_automation_config: "{{ ops_mgr_api_tmp_path }}/updated_automation_config.json"
+ops_mgr_api_temp_automation_config: "{{ ops_mgr_api_tmp_path }}/temp_automation_config.json"
+
+auth_keyfile: "/var/lib/mongodb-mms-automation/keyfile"
+
+jq_cmd_auth_disabled: '.auth += {"disabled": false}'
+jq_cmd_auth_key: '.auth += {"key": "{{ auth_key }}"}'
+
+jq_cmd_mdb_clusters_tls: '.tls += {"CAFilePath": "{{ automation_agent_config_httpsCAFile }}"}'
+jq_cmd_auth_disabled: '.auth += {"disabled": false}'
+## Pending on Kerveros Env
+#jq_cmd_mdb_clusters_authenticate: '.auth += {"deploymentAuthMechanisms": ["SCRAM-SHA-256", "GSSAPI"]}'
+jq_cmd_mdb_clusters_authenticate: '.auth += {"deploymentAuthMechanisms": ["SCRAM-SHA-256"]}'
+jq_cmd_mdb_agent_tls: '.tls += {"autoPEMKeyFilePath": "{{ mdb_cert_server_ca }}"}'
+jq_cmd_mdb_agent_authenticate: '.auth += {"autoAuthMechanisms": ["SCRAM-SHA-256"]}'
+
+jq_cmd_auth_autoUser: '.auth += {"autoUser": "mms-automation"}'
+jq_cmd_auth_autoPwd: '.auth += {"autoPwd": "w4FKr5tv9h8XAvHpgAsC8yjI"}'
+jq_cmd_auth_keyfile: '.auth += {"keyfile": "{{ auth_keyfile }}"}'
+jq_cmd_auth_keyfileWindows: '.auth += {"keyfileWindows": "%SystemDrive%\\MMSAutomation\\versions\\keyfile"}'
+
+mms_cluster_path: /data/{{ cluster_name }}
+replica_set_data_path: /data
+replica_set_log_path: /logs
+agent_mongod_conf: automation-mongod.conf
+mongod_conf: mongod.conf
+mongod_log: mongodb.log
+
+mdb_cluster_keytab_path: /data/keytab
+mdb_cluster_keytab_file: mongodb.keytab
+mdb_cluster_keytab: "{{ mdb_cluster_keytab_path }}/{{ mdb_cluster_keytab_file }}"
+
+mdb_cluster_keyfile_path: /data/keyfile
+mdb_cluster_encryption_key_file: rsmcjc-disk.key
+mdb_cluster_encryption_key: "{{ mdb_cluster_keyfile_path }}/{{ mdb_cluster_encryption_key_file }}"
+
+# dynamic generated for shardsvr
+shardsvr_args2_6_auditLog_destination: "syslog"
+shardsvr_args2_6_auditLog_filter: "{'$or':[{'atype':'authCheck','$or':[{'result':0,'roles.role':{'$in':['highPrivilegeRole']},'param.command':{'$in':['insert','delete','update','find','aggregate','endSessions']}},{'result':13}]},{'atype':{'$in':['authenticate','logout','createIndex','dropIndex','refineCollectionShardKey','applicationMessage','createUser','updateUser','directAuthMutation','dropUser','dropAllUsersFromDatabase','createRole','updateRole','dropRole','dropAllRolesFromDatabase','grantRolesToUser','revokeRolesFromUser','grantRolesToRole','revokeRolesFromRole','grantPrivilegesToRole','revokePrivilegesFromRole','createCollection','renameCollection','dropCollection','createDatabase','dropDatabase','replSetReconfig','enableSharding','shardCollection','addShard','removeShard','shutdown']}}]}"
+shardsvr_args2_6_net_bindIp: "127.0.0.1,{{ ansible_default_ipv4.address }}"
+shardsvr_args2_6_net_port: 38128
+shardsvr_args2_6_net_tls_certificateKeyFile: "{{ mdb_cert_server_ca }}"
+shardsvr_args2_6_net_tls_disabledProtocols: "TLS1_0,TLS1_1"
+shardsvr_args2_6_net_tls_mode: "requireTLS"
+shardsvr_args2_6_replication_replSetName: "{{ shard_name_prefix }}_{{ group_names[-1][-1] }}"
+shardsvr_args2_6_security_enableEncryption: true
+shardsvr_args2_6_security_encryptionKeyFile: "{{ mdb_cluster_encryption_key }}"
+shardsvr_args2_6_security_javascriptEnabled: false
+shardsvr_args2_6_setParameter_auditAuthorizationSuccess: "true"
+shardsvr_args2_6_storage_dbPath: "{{ mms_cluster_path }}{{ replica_set_data_path }}"
+shardsvr_args2_6_storage_wiredTiger_engineConfig_cacheSizeGB: 2.0
+shardsvr_args2_6_systemLog_destination: "file"
+shardsvr_args2_6_systemLog_logAppend: true
+shardsvr_args2_6_systemLog_path: "{{ mms_cluster_path }}{{ replica_set_log_path }}/{{ mongod_log }}"
+
+shardsvr_instance_auditLogRotate_sizeThresholdMB: 1000.0
+shardsvr_instance_auditLogRotate_timeThresholdHrs: 24
+shardsvr_instance_authSchemaVersion: 5
+shardsvr_instance_disabled: false
+shardsvr_instance_featureCompatibilityVersion: "8.0"
+shardsvr_instance_hostname: "{{ ansible_fqdn }}"
+shardsvr_instance_kerberos_keytab: "/data/keytab/mongodb.keytab"
+shardsvr_instance_logRotate_sizeThresholdMB: 1000.0
+shardsvr_instance_logRotate_timeThresholdHrs: 24
+shardsvr_instance_manualMode: false
+shardsvr_instance_name: "{{ cluster_name }}_{{ shardsvr_args2_6_replication_replSetName }}_{{ instance_sequence }}"
+shardsvr_instance_processType: "mongod"
+shardsvr_instance_version: "8.0.4-ent"
+
+# dynamic generated for configsvr
+configsvr_args2_6_auditLog_destination: "syslog"
+configsvr_args2_6_auditLog_filter: "{'$or':[{'atype':'authCheck','$or':[{'result':0,'roles.role':{'$in':['highPrivilegeRole']},'param.command':{'$in':['insert','delete','update','find','aggregate','endSessions']}},{'result':13}]},{'atype':{'$in':['authenticate','logout','createIndex','dropIndex','refineCollectionShardKey','applicationMessage','createUser','updateUser','directAuthMutation','dropUser','dropAllUsersFromDatabase','createRole','updateRole','dropRole','dropAllRolesFromDatabase','grantRolesToUser','revokeRolesFromUser','grantRolesToRole','revokeRolesFromRole','grantPrivilegesToRole','revokePrivilegesFromRole','createCollection','renameCollection','dropCollection','createDatabase','dropDatabase','replSetReconfig','enableSharding','shardCollection','addShard','removeShard','shutdown']}}]}"
+configsvr_args2_6_net_bindIp: "127.0.0.1,{{ ansible_default_ipv4.address }}"
+configsvr_args2_6_net_port: 38129
+configsvr_args2_6_net_tls_certificateKeyFile: "{{ mdb_cert_server_ca }}"
+configsvr_args2_6_net_tls_disabledProtocols: "TLS1_0,TLS1_1"
+configsvr_args2_6_net_tls_mode: "requireTLS"
+configsvr_args2_6_replication_replSetName: "{{ config_server_replica_set_name }}"
+configsvr_args2_6_security_enableEncryption: true
+configsvr_args2_6_security_encryptionKeyFile: "{{ mdb_cluster_encryption_key }}"
+configsvr_args2_6_security_javascriptEnabled: false
+configsvr_args2_6_setParameter_auditAuthorizationSuccess: "true"
+configsvr_args2_6_sharding_clusterRole: "configsvr"
+configsvr_args2_6_storage_dbPath: "{{ mms_cluster_path }}{{ replica_set_data_path }}"
+configsvr_args2_6_storage_wiredTiger_engineConfig_cacheSizeGB: 2.0
+configsvr_args2_6_systemLog_destination: "file"
+configsvr_args2_6_systemLog_logAppend: true
+configsvr_args2_6_systemLog_path: "{{ mms_cluster_path }}{{ replica_set_log_path }}/{{ mongod_log }}"
+
+configsvr_instance_auditLogRotate_sizeThresholdMB: 1000.0
+configsvr_instance_auditLogRotate_timeThresholdHrs: 24
+configsvr_instance_authSchemaVersion: 5
+configsvr_instance_disabled: false
+configsvr_instance_featureCompatibilityVersion: "8.0"
+configsvr_instance_hostname: "{{ ansible_fqdn }}"
+configsvr_instance_kerberos_keytab: "/data/keytab/mongodb.keytab"
+configsvr_instance_logRotate_sizeThresholdMB: 1000.0
+configsvr_instance_logRotate_timeThresholdHrs: 24
+configsvr_instance_manualMode: false
+configsvr_instance_name: "{{ cluster_name }}_{{ config_server_replica_set_name }}_{{ instance_sequence }}"
+configsvr_instance_processType: "mongod"
+configsvr_instance_version: "8.0.4-ent"
+
+# dynamic generated for mongos
+mongos_args2_6_auditLog_destination: "syslog"
+mongos_args2_6_auditLog_filter: "{'$or':[{'atype':'authCheck','$or':[{'result':0,'roles.role':{'$in':['highPrivilegeRole']},'param.command':{'$in':['insert','delete','update','find','aggregate','endSessions']}},{'result':13}]},{'atype':{'$in':['authenticate','logout','createIndex','dropIndex','refineCollectionShardKey','applicationMessage','createUser','updateUser','directAuthMutation','dropUser','dropAllUsersFromDatabase','createRole','updateRole','dropRole','dropAllRolesFromDatabase','grantRolesToUser','revokeRolesFromUser','grantRolesToRole','revokeRolesFromRole','grantPrivilegesToRole','revokePrivilegesFromRole','createCollection','renameCollection','dropCollection','createDatabase','dropDatabase','replSetReconfig','enableSharding','shardCollection','addShard','removeShard','shutdown']}}]}"
+mongos_args2_6_net_bindIp: "127.0.0.1,{{ ansible_default_ipv4.address }}"
+mongos_args2_6_net_port: 38130
+mongos_args2_6_net_tls_certificateKeyFile: "{{ mdb_cert_server_ca }}"
+mongos_args2_6_net_tls_disabledProtocols: "TLS1_0,TLS1_1"
+mongos_args2_6_net_tls_mode: "requireTLS"
+mongos_args2_6_security_enableEncryption: true
+mongos_args2_6_security_encryptionKeyFile: "{{ mdb_cluster_encryption_key }}"
+mongos_args2_6_security_javascriptEnabled: false
+mongos_args2_6_setParameter_auditAuthorizationSuccess: "true"
+mongos_args2_6_systemLog_destination: "file"
+mongos_args2_6_systemLog_logAppend: true
+mongos_args2_6_systemLog_path: "{{ mms_cluster_path }}{{ replica_set_log_path }}/{{ mongod_log }}"
+
+mongos_instance_auditLogRotate_sizeThresholdMB: 1000.0
+mongos_instance_auditLogRotate_timeThresholdHrs: 24
+mongos_instance_authSchemaVersion: 5
+mongos_instance_cluster: "{{ cluster_name }}"
+mongos_instance_disabled: false
+mongos_instance_featureCompatibilityVersion: "8.0"
+mongos_instance_hostname: "{{ ansible_fqdn }}"
+mongos_instance_kerberos_keytab: "/data/keytab/mongodb.keytab"
+mongos_instance_logRotate_sizeThresholdMB: 1000.0
+mongos_instance_logRotate_timeThresholdHrs: 24
+mongos_instance_manualMode: false
+mongos_instance_name: "{{ cluster_name }}_mongos_{{ instance_sequence }}"
+mongos_instance_processType: "mongos"
+mongos_instance_version: "8.0.4-ent"
+
+# dynamic generated for shardsvr
+shardsvr_replicaSets_id: "{{ shard_name_prefix }}_{{ group_names[-1][-1] }}"
+shardsvr_replicaSets_protocolVersion: "1"
+
+shardsvr_replicaSets_members_arbiterOnly: false
+shardsvr_replicaSets_members_buildIndexes: true
+shardsvr_replicaSets_members_hidden: false
+shardsvr_replicaSets_members_host: "{{ cluster_name }}_{{ shardsvr_args2_6_replication_replSetName }}"
+shardsvr_replicaSets_members_priority: 1
+shardsvr_replicaSets_members_secondaryDelaySecs: 0
+shardsvr_replicaSets_members_votes: 1
+
+# dynamic generated for configsvr
+configsvr_replicaSets_id: "{{ config_server_replica_set_name }}"
+configsvr_replicaSets_protocolVersion: "1"
+
+configsvr_replicaSets_members_arbiterOnly: false
+configsvr_replicaSets_members_buildIndexes: true
+configsvr_replicaSets_members_hidden: false
+configsvr_replicaSets_members_host: "{{ configsvr_instance_name }}"
+configsvr_replicaSets_members_priority: 1
+configsvr_replicaSets_members_secondaryDelaySecs: 0
+configsvr_replicaSets_members_votes: 1
+
+processes_shardsvr_element_json: "processes_shardsvr_{{ shardsvr_args2_6_replication_replSetName }}_{{ instance_sequence }}.json"
+processes_configsvr_element_json: "processes_configsvr_{{ instance_sequence }}.json"
+processes_mongos_element_json: "processes_mongos_{{ instance_sequence }}.json"
+
+replicaSets_shardsvr_element_json: "replicaSets_shardsvr_{{ shardsvr_args2_6_replication_replSetName }}_{{ instance_sequence }}.json"
+replicaSets_configsvr_element_json: "replicaSets_configsvr_{{ instance_sequence }}.json"
+
+# dynamic generated for sharding
+sharding_configServerReplica: "{{ config_server_replica_set_name }}"
+sharding_managedSharding: false
+sharding_name: "{{ cluster_name }}"
+
+role: "highPrivilegeRole"
+
+internal_user_1_json: "internal_user_1.json"
+internal_user_2_json: "internal_user_2.json"
+
+common_user_1_json: "common_user_1.json"
+common_user_2_json: "common_user_2.json"
+common_user_3_json: "common_user_3.json"
+
+ops_mgr_api_tmp_auth_usersWanted_user_1: "{{ ops_mgr_api_tmp_path }}/{{ internal_user_1_json }}"
+ops_mgr_api_tmp_auth_usersWanted_user_2: "{{ ops_mgr_api_tmp_path }}/{{ internal_user_2_json }}"
+
+ops_mgr_api_tmp_auth_usersWanted_comm_user_1: "{{ ops_mgr_api_tmp_path }}/{{ common_user_1_json }}"
+ops_mgr_api_tmp_auth_usersWanted_comm_user_2: "{{ ops_mgr_api_tmp_path }}/{{ common_user_2_json }}"
+ops_mgr_api_tmp_auth_usersWanted_comm_user_3: "{{ ops_mgr_api_tmp_path }}/{{ common_user_3_json }}"

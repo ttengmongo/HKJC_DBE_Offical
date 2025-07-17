@@ -1,0 +1,13 @@
+---
+- import_tasks: backup_configuration.yml
+  tags: backup
+
+- import_tasks: upgrade.yml
+  tags: upgrade
+
+- name: Ops Manager app service restart
+  import_tasks: app_restart.yml
+  tags: app_restart
+
+- import_tasks: sanity_check.yml
+  tags: sanity_check

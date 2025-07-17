@@ -1,0 +1,40 @@
+---
+- name: Prepare vars for automation-agent.config
+  set_fact:
+    mmsGroupId: "{{ project_id }}"
+    mmsApiKey: "{{ agent_api_key }}"
+    mmsBaseUrl: "https://{{ ops_mgr_app_server }}:{{ ops_mgr_app_port }}"
+    httpsCAFile: "{{ automation_agent_config_httpsCAFile }}"
+
+- name: Print vars for automation-agent.config
+  debug:
+    msg: "mmsGroupId={{ mmsGroupId }}, mmsApiKey={{ mmsApiKey }}, mmsBaseUrl={{ mmsBaseUrl }}, httpsCAFile={{ httpsCAFile }}"
+
+- name: Modify mmsGroupId
+  lineinfile:
+    path: "{{ automation_agent_config }}"
+    regexp: '^mmsGroupId='
+    line: 'mmsGroupId={{ mmsGroupId }}'
+    state: present
+    backup: yes
+
+- name: Modify mmsApiKey
+  lineinfile:
+    path: "{{ automation_agent_config }}"
+    regexp: '^mmsApiKey='
+    line: 'mmsApiKey={{ mmsApiKey }}'
+    state: present
+
+- name: Modify mmsBaseUrl
+  lineinfile:
+    path: "{{ automation_agent_config }}"
+    regexp: '^mmsBaseUrl='
+    line: 'mmsBaseUrl={{ mmsBaseUrl }}'
+    state: present
+
+- name: Modify httpsCAFile
+  lineinfile:
+    path: "{{ automation_agent_config }}"
+    regexp: '^httpsCAFile='
+    line: 'httpsCAFile={{ httpsCAFile }}'
+    state: present

@@ -1,0 +1,6 @@
+---
+- import_tasks: fetch_ops_mgr_api_keys.yml
+  tags: fetch_ops_mgr_api_keys
+
+- import_tasks: create_one_project.yml
+  tags: create_one_project

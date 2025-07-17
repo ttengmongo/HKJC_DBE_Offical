@@ -1,0 +1,62 @@
+{
+    "args2_6": {
+        "auditLog": {
+		    "destination": "{{ shardsvr_args2_6_auditLog_destination }}",
+            "filter": "{{ shardsvr_args2_6_auditLog_filter }}"
+        },
+        "net": {
+            "bindIp": "{{ shardsvr_args2_6_net_bindIp }}",
+            "port": {{ shardsvr_args2_6_net_port }},
+            "tls": {
+                "certificateKeyFile": "{{ shardsvr_args2_6_net_tls_certificateKeyFile }}",
+                "disabledProtocols": "{{ shardsvr_args2_6_net_tls_disabledProtocols }}",
+                "mode": "{{ shardsvr_args2_6_net_tls_mode }}"
+            }
+        },
+        "replication": {
+            "replSetName": "{{ shardsvr_args2_6_replication_replSetName }}"
+        },
+        "security": {
+            "enableEncryption": {{ shardsvr_args2_6_security_enableEncryption | lower}},
+            "encryptionKeyFile": "{{ shardsvr_args2_6_security_encryptionKeyFile}}",
+            "javascriptEnabled": {{ shardsvr_args2_6_security_javascriptEnabled | lower}}
+        },
+        "setParameter": {
+            "auditAuthorizationSuccess": "{{ shardsvr_args2_6_setParameter_auditAuthorizationSuccess }}"
+        },
+        "storage": {
+            "dbPath": "{{ shardsvr_args2_6_storage_dbPath }}",
+            "wiredTiger": {
+                "collectionConfig": {},
+                "engineConfig": {
+                    "cacheSizeGB": {{ shardsvr_args2_6_storage_wiredTiger_engineConfig_cacheSizeGB }}
+                },
+                "indexConfig": {}
+            }
+        },
+        "systemLog": {
+            "destination": "{{ shardsvr_args2_6_systemLog_destination }}",
+            "logAppend": {{ shardsvr_args2_6_systemLog_logAppend | lower}},
+            "path": "{{ shardsvr_args2_6_systemLog_path }}"
+        }
+    },
+    "auditLogRotate": {
+        "sizeThresholdMB": {{ shardsvr_instance_auditLogRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ shardsvr_instance_auditLogRotate_timeThresholdHrs }}
+    },
+    "authSchemaVersion": {{ shardsvr_instance_authSchemaVersion }},
+    "disabled": {{ shardsvr_instance_disabled | lower}},
+    "featureCompatibilityVersion": "{{ shardsvr_instance_featureCompatibilityVersion }}",
+    "hostname": "{{ shardsvr_instance_hostname }}",
+    "kerberos": {
+        "keytab": "{{ shardsvr_instance_kerberos_keytab }}"
+    },
+    "logRotate": {
+        "sizeThresholdMB": {{ shardsvr_instance_logRotate_sizeThresholdMB }},
+        "timeThresholdHrs": {{ shardsvr_instance_logRotate_timeThresholdHrs }}
+    },
+    "manualMode": {{ shardsvr_instance_manualMode | lower}},
+    "name": "{{ shardsvr_instance_name }}",
+    "processType": "{{ shardsvr_instance_processType }}",
+    "version": "{{ shardsvr_instance_version }}"
+}

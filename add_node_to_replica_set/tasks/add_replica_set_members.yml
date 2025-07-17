@@ -1,0 +1,28 @@
+---
+- name: Add member to appsdb replica set
+  command:
+    cmd: "mongosh --host {{ mongodb__connection }} --port {{ mongodb_db_port }} -u {{ mongodb_user }} -p {{ mongodb_password  }} --tls --tlsCAFile {{ source_ssl_path }}{{ ca_pem_name }} --authenticationDatabase admin --eval '{{ mongodb_add_member }}'"
+  register: appsdb_add_member
+
+- name: Display the appsdb replica set status
+  debug:
+    msg: "Appsdb replica set status: {{ appsdb_add_member.stdout }}"
+
+- name: Check appsdb replica set status
+  command:
+    cmd: "mongosh --host {{ mongodb__connection }} --port {{ mongodb_db_port }} -u {{ mongodb_user }} -p {{ mongodb_password  }} --tls --tlsCAFile {{ source_ssl_path }}{{ ca_pem_name }} --authenticationDatabase admin --eval 'rs.status();'"
+  register: appsdb_replica_set_status
+
+- name: Display the appsdb replica set status
+  debug:
+    msg: "Appsdb replica set status: {{ appsdb_replica_set_status.stdout }}"
+
+- name: Remove the scp destination folder
+  file:
+    path: "{{ scp_dest_folder }}"
+    state: absent
+  register: remove_result
+
+- name: Display the remove result
+  debug:
+    msg: "Remove result: {{ remove_result }}"

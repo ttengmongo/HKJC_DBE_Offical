@@ -1,0 +1,8 @@
+---
+- name: Generate roles json
+  template:
+    src: roles.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/roles.json"
+    owner: root
+    group: root
+    mode: '0755'

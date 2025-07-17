@@ -1,0 +1,12 @@
+---
+- import_tasks: fetch_cert.yml
+  tags: fetch_cert
+
+- import_tasks: distribute_cert.yml
+  tags: distribute_cert
+
+- import_tasks: verify_cert.yml
+  tags: verify_cert
+
+- import_tasks: set_mongod_permission.yml
+  tags: set_mongod_permission

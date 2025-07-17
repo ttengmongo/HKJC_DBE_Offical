@@ -1,0 +1,8 @@
+## <Replace to Your New AppDB Account's Username>
+new_db_account_name: 'test'
+
+## <Replace to Your New AppDB Account's Password>
+new_db_account_pwd: 'test'
+
+## <Replace to Your New AppDB Account's Roles>
+new_db_account: '{user: "{{ new_db_account_name }}", pwd: "{{ new_db_account_pwd }}", roles: [{db: "admin", role: "readWriteAnyDatabase"}]}'

@@ -1,0 +1,15 @@
+---
+- name: Check if mongodb-mms_status is running
+  systemd:
+    name: mongodb-mms
+    state: started
+  register: mongodb_mms_status
+
+- name: Display mongodb-mms status
+  debug:
+    msg: "mongodb-mms status is : {{ mongodb_mms_status.status.ActiveState }} and state time was : {{ mongodb_mms_status.status.ExecMainStartTimestamp }}"
+
+- name: Verify mongodb-mms  is running
+  fail:
+    msg: "mongodb-mms launch is failed"
+  when: mongodb_mms_status.status.ActiveState == 'failed'

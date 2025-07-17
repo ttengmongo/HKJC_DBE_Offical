@@ -1,0 +1,17 @@
+## <Replace to Your Project ID>
+project_id: "682ecaed7d5ae0677620f813"
+
+## <Replace to Your Project API Public Key>
+project_api_public_key: "wfoknqti"
+
+## <Replace to Your Project API Private Key>
+project_api_private_key: "eecfa944-c4e1-4dd8-b23a-92f6804938a3"
+
+## <Replace to Your Cluster Name, and don't be duplicated in the same project>
+cluster_name: "your-replicaset-cluster"
+
+## <Replace to Your Username for scp>
+scp_source_user: "jiacy"
+
+## <Replace to Your Password for scp>
+scp_source_pwd: "123456"

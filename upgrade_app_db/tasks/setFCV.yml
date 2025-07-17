@@ -1,0 +1,51 @@
+---
+- name: Extract MongoDB version
+  set_fact:
+    #mongodb_version: "{{ binary_name | regex_search('mongodb-enterprise-server-(\\d+\\.\\d+)', '\\1') }}"
+    mongodb_version: "{{ mongodb_major_version }}"
+
+- name: Display MongoDB version
+  debug:
+    msg: "MongoDB version: {{ mongodb_version[0] | int }}"
+
+- name: Display the hostname
+  debug:
+    msg: "Hostname: {{ ansible_fqdn }}"
+
+#- block:
+- name: Get MongoDB feature compatibility version for AppDB
+  command:
+    cmd: "mongosh --host {{ ansible_fqdn }} --port {{ mongodb_db_port }} -u {{ mongodb_user }} -p {{ mongodb_password  }} --tls --tlsCAFile {{ source_ssl_path }}{{ ca_pem_name }} --authenticationDatabase admin --eval 'db.adminCommand( { getParameter:1, featureCompatibilityVersion: 1 } )'"
+  register: get_feature_compatibility_version
+  changed_when: true
+  ignore_errors: yes
+
+- name: Display the get feature compatibility version result for AppDB
+  debug:
+    msg: "get feature compatibility version result for AppDB: {{ get_feature_compatibility_version.stdout }}"
+
+
+- name: Set MongoDB feature compatibility version for AppDB
+  command:
+    cmd: "mongosh --host {{ ansible_fqdn }} --port {{ mongodb_db_port }} -u {{ mongodb_user }} -p {{ mongodb_password  }} --tls --tlsCAFile {{ source_ssl_path }}{{ ca_pem_name }}  --authenticationDatabase admin --eval 'db.adminCommand( { setFeatureCompatibilityVersion: \"{{ mongodb_version[0:3] }}\", confirm: true } )'"
+  register: set_feature_compatibility_version
+  changed_when: true
+  ignore_errors: yes
+
+- name: Display the set feature compatibility version result for AppDB
+  debug:
+    msg: "set feature compatibility version result for AppDB: {{ set_feature_compatibility_version.stdout }}"
+
+
+- name: Get MongoDB feature compatibility version for AppDB
+  command:
+    cmd: "mongosh --host {{ ansible_fqdn }} --port {{ mongodb_db_port }} -u {{ mongodb_user }} -p {{ mongodb_password  }} --tls --tlsCAFile {{ source_ssl_path }}{{ ca_pem_name }} --authenticationDatabase admin --eval 'db.adminCommand( { getParameter:1, featureCompatibilityVersion: 1 } )'"
+  register: get_feature_compatibility_version
+  changed_when: true
+  ignore_errors: yes
+
+- name: Display the get feature compatibility version result for AppDB
+  debug:
+    msg: "get feature compa
+    tibility version result for AppDB: {{ get_feature_compatibility_version.stdout }}"
+#  when: mongodb_major_version_update

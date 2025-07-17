@@ -1,0 +1,28 @@
+binary_path: '/backup/mongodb_installation/binary/'
+mongodb_binary_name: 'mongodb-enterprise-server-7.0.11-1.suse15.x86_64.rpm'
+mongosh_binary_name: 'mongodb-mongosh-2.3.9.x86_64.rpm'
+
+scp_user: 'jiacy'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no {{ scp_user }}@'
+#scp_command:  'spawn ssh -oStrictHostKeyChecking=no ted@'
+scp_password: '1234QQQ'
+scp_dest_folder: '/backup/mongo_config/'
+
+source_host: 'ip-172-31-33-159.eu-west-1.compute.internal'
+source_ops_manager_port: '8132'
+source_ops_manager_agent_name: 'mongodb-mms-automation-agent-manager-107.0.10.8627-1.x86_64.rhel7.rpm'
+
+source_ssl_path: '/etc/ssl/mongodb/'
+server_cert_pem_name: 'ip-172-31-33-159.pem'
+ca_pem_name: 'mongodb_rootCA.pem'
+keyfile_path: '/data/keyfile/'
+keyfile_name: 'backingdb-keyfile'
+data_path: '/data/appdb/'
+mongodb_config_path: '/data/appdb/mongod.conf'
+
+mongodb_db_port: 38132
+mongodb_user: 'dbadmin'
+mongodb_password: 'dbadmin'
+mongodb__connection: 'ip-172-31-33-159.eu-west-1.compute.internal:{{ mongodb_db_port }},ip-172-31-45-83.eu-west-1.compute.internal:{{ mongodb_db_port }},ip-172-31-33-22.eu-west-1.compute.internal:{{ mongodb_db_port }}'
+mongodb_add_member: 'var cfg = rs.conf(); cfg.members.push({_id: cfg.members.length, host: "{{ ansible_fqdn }}:{{ mongodb_db_port }}", hidden: false, priority: 0}); rs.reconfig(cfg);'
+

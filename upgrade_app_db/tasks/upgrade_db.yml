@@ -1,0 +1,44 @@
+# tasks/upgrade_db.yml
+---
+- name: Extract MongoDB version
+  set_fact:
+    #mongodb_version: "{{ binary_name | regex_search('mongodb-enterprise-server-(\\d+\\.\\d+)', '\\1') }}"
+    mongodb_version: "{{ mongodb_major_version }}"
+
+- name: Display MongoDB version
+  debug:
+    msg: "MongoDB version: {{ mongodb_version[0] | int }}"
+
+- name: Check current installation
+  command:
+    cmd: zypper search -i -s mongodb-enterprise-server
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"
+
+- name: Install new MongoDB version
+  zypper:
+#    name: "{{ package_info[version]['packages_list'] |map('regex_replace', '^(.+)$', '%s/\\1' % binary_path) |list }}"
+    name: '{{ binary_path }}{{ binary_name }}'
+    disable_gpg_check: yes
+    force: yes
+    state: present
+  register: install_result
+  changed_when: install_result.changed == True
+
+- name: Display the install result
+  debug:
+    msg: "Install result: {{ install_result }}"
+
+- name: Check current installation
+  command:
+    cmd: zypper search -i -s mongodb-enterprise-server
+  register: check_result
+  changed_when: false
+
+- name: Display the check result
+  debug:
+    msg: "Check result: {{ check_result.stdout }}"

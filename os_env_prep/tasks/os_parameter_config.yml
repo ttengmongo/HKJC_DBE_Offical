@@ -1,0 +1,29 @@
+---
+- name: Ensure sysctl parameters are set in /etc/sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^{{ item.key }}='
+    line: '{{ item.key }}={{ item.value }}'
+    state: present
+  loop: "{{ sysctl_configs }}"
+  register: sysctl_result
+
+- name: Display the sysctl parameters set result
+  debug:
+    msg: "Sysctl parameters set result: {{ sysctl_result }}"
+
+- name: Reload sysctl settings
+  command: sysctl -p
+  register: sysctl_reload_result
+  changed_when: sysctl_reload_result.changed
+
+- name: Display the sysctl reload result
+  debug:
+    msg: "Sysctl reload result: {{ sysctl_reload_result }}"
+
+- name: Ensure limits are set in /etc/security/limits.conf
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "{{ item }}"
+    state: present
+  loop: "{{ limits_configs }}"

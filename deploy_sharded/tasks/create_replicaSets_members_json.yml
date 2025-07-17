@@ -1,0 +1,45 @@
+---
+- name: Set var filtered_shard_groups
+  set_fact:
+    filtered_shard_groups: "{{ groups.keys() | select('match', '^sharded-cluster-shard-\\d+$') }}"
+
+- name: Print filtered_shard_groups
+  debug:
+    var: filtered_shard_groups
+
+- name: Set var num_of_shards, num_of_nodes_per_shard, num_of_nodes_configsvr
+  set_fact:
+    num_of_shards: "{{ filtered_shard_groups | map('regex_replace', '^.*?(\\d+)$', '\\1') | map('int') | max + 1}}"
+    num_of_nodes_per_shard: "{{ groups['sharded-cluster-shard-0'] | length}}"
+    num_of_nodes_configsvr: "{{ groups['sharded-cluster-config-server'] | length}}"
+
+- name: Print var num_of_shards, num_of_nodes_per_shard, num_of_nodes_configsvr
+  debug:
+    msg: "num_of_shards={{ num_of_shards }}, num_of_nodes_per_shard={{ num_of_nodes_per_shard }}, num_of_nodes_configsvr={{ num_of_nodes_configsvr }}"
+
+- name: Set vars for instance_index, instance_sequence
+  set_fact:
+    instance_index: "{{ ansible_play_hosts_all.index(inventory_hostname) }}"
+    instance_sequence: "{{ ansible_play_hosts_all.index(inventory_hostname) + 1 }}"
+
+- name: Print instance_index, instance_sequence
+  debug:
+    msg: "{{ ansible_fqdn }}, {{ instance_index }}, {{ instance_sequence }}"
+
+- name: Generate replicaSets_shardsvr.members json
+  template:
+    src: replicaSets_shardsvr.members.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ replicaSets_shardsvr_element_json }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: inventory_hostname in (groups.keys() | select("match", "sharded-cluster-shard-\\d+") | map("extract", groups) | flatten | unique)
+
+- name: Generate replicaSets_configsvr.members json
+  template:
+    src: replicaSets_configsvr.members.j2
+    dest: "{{ ops_mgr_api_tmp_path }}/{{ replicaSets_configsvr_element_json }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: inventory_hostname in groups['sharded-cluster-config-server']

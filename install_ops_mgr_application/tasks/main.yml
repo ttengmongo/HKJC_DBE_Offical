@@ -1,0 +1,54 @@
+---
+- import_tasks: install_rpm_ops_mgr.yml
+  tags: install_rpm_ops_mgr
+  when: inventory_hostname in groups['ops-mgr-application']
+
+- import_tasks: get_hostname_list.yml
+  tags: get_hostname_list
+  when: inventory_hostname == groups['ops-mgr-appdb'][0]
+
+- import_tasks: encrypt_pwd_with_credentialstool.yml
+  tags: encrypt_pwd_with_credentialstool
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: modify_conf_mms_properties.yml
+  tags: modify_conf_mms_properties
+  when: inventory_hostname in groups['ops-mgr-application']
+
+- import_tasks: modify_mms_conf.yml
+  tags: modify_mms_conf
+  when: inventory_hostname in groups['ops-mgr-application']
+
+- import_tasks: prepare_tgz_for_mongodb_releases.yml
+  tags: prepare_tgz_for_mongodb_releases
+  when: inventory_hostname in groups['ops-mgr-application']
+
+- import_tasks: start_first_mms_service.yml
+  tags: start_first_mms_service
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: scp_mongodb_mms_gen_key.yml
+  tags: scp_mongodb_mms_gen_key
+  when:
+    inventory_hostname in groups['ops-mgr-application']
+    and inventory_hostname != groups['ops-mgr-application'][0]
+
+- import_tasks: start_others_mms_service.yml
+  tags: start_others_mms_service
+  when:
+    inventory_hostname in groups['ops-mgr-application']
+    and inventory_hostname != groups['ops-mgr-application'][0]
+
+- import_tasks: create_first_ops_mgr_user.yml
+  tags: create_first_ops_mgr_user
+  when: inventory_hostname == groups['ops-mgr-application'][0]
+
+- import_tasks: prepare_non_first_ops_mgr_server.yml
+  tags: prepare_non_first_ops_mgr_server
+  when:
+    inventory_hostname in groups['ops-mgr-application']
+    and inventory_hostname != groups['ops-mgr-application'][0]
+
+- import_tasks: create_global_access_list.yml
+  tags: create_global_access_list
+  when: inventory_hostname in groups['ops-mgr-application']

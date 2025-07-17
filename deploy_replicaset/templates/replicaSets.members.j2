@@ -1,0 +1,10 @@
+{
+    "_id": {{ index }},
+    "arbiterOnly": {{ replicaSets_members_arbiterOnly | lower }},
+    "buildIndexes": {{ replicaSets_members_buildIndexes | lower }},
+    "hidden": {{ replicaSets_members_hidden | lower}},
+    "host": "{{ args2_6_replication_replSetName }}_{{ index + 1 }}",
+    "priority": {{ replicaSets_members_priority }},
+    "secondaryDelaySecs": {{ replicaSets_members_secondaryDelaySecs }},
+    "votes": {{ replicaSets_members_votes }}
+}

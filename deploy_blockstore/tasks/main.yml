@@ -1,0 +1,52 @@
+---
+- import_tasks: clear_history_json.yml
+  tags: clear_history_json
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: install_jq.yml
+  tags: install_jq
+
+- import_tasks: prepare_replica_set_dir.yml
+  tags: prepare_replica_set_dir
+
+- import_tasks: config_mdb_clusters_tls.yml
+  tags: config_mdb_clusters_tls
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: config_mdb_clusters_authenticate.yml
+  tags: config_mdb_clusters_authenticate
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: config_mdb_agent_authenticate.yml
+  tags: config_mdb_agent_authenticate
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: config_mdb_agent_tls.yml
+  tags: config_mdb_agent_tls
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: create_automation_internal_user.yml
+  tags: create_automation_internal_user
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: create_project_processes_json.yml
+  tags: create_project_processes_json
+
+- import_tasks: scp_project_processes_json.yml
+  tags: scp_project_processes_json
+  when: inventory_hostname != play_hosts[0]
+
+- import_tasks: create_project_replicaSets_json.yml
+  tags: create_project_replicaSets_json
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: deploy_cluster.yml
+  tags: deploy_cluster
+  when: inventory_hostname == play_hosts[0]
+
+- import_tasks: create_soft_link_mongod_conf.yml
+  tags: create_soft_link_mongod_conf
+
+- import_tasks: create_blockstore_user.yml
+  tags: create_blockstore_user
+  when: inventory_hostname == play_hosts[0]

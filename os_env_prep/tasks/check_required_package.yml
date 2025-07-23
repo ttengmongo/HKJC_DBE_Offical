@@ -1,0 +1,19 @@
+---
+- name: Check if each package is installed
+  command: "rpm -q {{ item }}"
+  register: rpm_check
+  ignore_errors: yes
+  loop: "{{ required_packages }}"
+
+- name: Collect missing packages
+  set_fact:
+    missing_packages: "{{ rpm_check.results | selectattr('rc', '!=', 0) | map(attribute='item') | list }}"
+
+#- name: Show missing packages
+#  debug:
+#    msg: "Missing packages: {{ missing_packages }}"
+
+- name: Fail if there are missing packages
+  fail:
+    msg: "Missing packages: {{ missing_packages }}"
+  when: missing_packages | length > 0

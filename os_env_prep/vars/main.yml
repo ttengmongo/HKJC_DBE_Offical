@@ -1,46 +1,68 @@
-binary_path: '/backup/mongodb_installation/binary/'
+binary_path: '/data/backup/mongodb_installation/binary/HKJC_MONGO_OS_LIB/'
+required_packages:
+  - cyrus-sasl
+  - cyrus-sasl-plain
+  - cyrus-sasl-gssapi
+  - krb5
+  - libjq1
+  - libcurl4
+  - libldap-2_4-2
+  - libopenssl1_1
+  - libsensors4
+  - libwrap0
+  - liblzma5
+  - python3-configobj
+  - python3-linux-procfs
+  - python3-pyudev
+  - insserv-compat
+  - tuned
+  - jq
+
 dependency_packages:
-    - tuned-2.10.0-150600.28.3.1.noarch.rpm
-    - insserv-compat-0.1-4.6.1.noarch.rpm
-    - cyrus-sasl-2.1.28-150600.7.3.1.x86_64.rpm
-    - cyrus-sasl-plain-2.1.28-150600.7.3.1.x86_64.rpm
-    - cyrus-sasl-gssapi-2.1.28-150600.7.3.1.x86_64.rpm
-    - krb5-1.20.1-150600.11.8.1.x86_64.rpm
-    - libcurl4-8.6.0-150600.4.21.1.x86_64.rpm
-    - libldap-2_4-2-2.4.46-150600.23.21.x86_64.rpm
-    - libopenssl1_1-1.1.1w-150600.5.12.2.x86_64.rpm
-    - libsensors4-3.5.0-4.6.1.x86_64.rpm
-    - libwrap0-7.6-1.433.x86_64.rpm
-    - liblzma5-5.4.1-150600.3.3.1.x86_64.rpm
-    - python3-configobj-5.0.6-150000.3.3.1.noarch.rpm
-    - python3-linux-procfs-0.7.1-150600.1.2.noarch.rpm
-    - python3-pyudev-0.22.0+git.1642212208.d5630bf-150400.5.50.noarch.rpm
-    - jq-1.6-3.3.1.x86_64.rpm
+  - insserv-compat-0.1-4.6.1.noarch.rpm
+  - cyrus-sasl-2.1.28-150600.7.3.1.x86_64.rpm
+  - cyrus-sasl-plain-2.1.28-150600.7.3.1.x86_64.rpm
+  - cyrus-sasl-gssapi-2.1.28-150600.7.3.1.x86_64.rpm
+  - krb5-1.20.1-150600.11.8.1.x86_64.rpm
+  - libcurl4-8.6.0-150600.4.21.1.x86_64.rpm
+  - libldap-2_4-2-2.4.46-150600.23.21.x86_64.rpm
+  - libopenssl1_1-1.1.1w-150600.5.12.2.x86_64.rpm
+  - libsensors4-3.5.0-4.6.1.x86_64.rpm
+  - libwrap0-7.6-1.433.x86_64.rpm
+  - liblzma5-5.4.1-150600.3.3.1.x86_64.rpm
+  - python3-configobj-5.0.6-150000.3.3.1.noarch.rpm
+  - python3-linux-procfs-0.7.1-150600.1.2.noarch.rpm
+  - python3-pyudev-0.22.0+git.1642212208.d5630bf-150400.5.50.noarch.rpm
+  - virt-what-1.21-3.3.1.x86_64.rpm
+  - tuned-2.10.0-150600.28.3.1.noarch.rpm
+  - libonig4-6.7.0-150000.3.6.1.x86_64.rpm
+  - libjq1-1.6-3.3.1.x86_64.rpm
+  - jq-1.6-3.3.1.x86_64.rpm
 
 sysctl_configs:
-    - { key: 'vm.dirty_ratio', value: '10' }
-    - { key: 'vm.max_map_count', value: '102400' }
-    - { key: 'vm.swappiness', value: '1' }
+  - { key: 'vm.dirty_ratio', value: '10' }
+  - { key: 'vm.max_map_count', value: '102400' }
+  - { key: 'vm.swappiness', value: '1' }
 
 limits_configs:
-    - mongod           hard    fsize           unlimited
-    - mongod           sort    fsize           unlimited
-    - mongod           hard    cpu           unlimited
-    - mongod           sort    cpu           unlimited
-    - mongod           hard    as           unlimited
-    - mongod           sort    as           unlimited
-    - mongod           hard    rss           unlimited
-    - mongod           sort    rss           unlimited
-    - mongod           hard    memlock           unlimited
-    - mongod           sort    memlock           unlimited
-    - mongod           hard    nofile           64000
-    - mongod           sort    nofile           64000
-    - mongod           hard    nproc           64000
-    - mongod           sort    nproc           64000
-    - mongod-mms           hard    nproc           500000
-    - mongod-mms           sort    nproc           200000
+  - mongod           hard    fsize           unlimited
+  - mongod           sort    fsize           unlimited
+  - mongod           hard    cpu           unlimited
+  - mongod           sort    cpu           unlimited
+  - mongod           hard    as           unlimited
+  - mongod           sort    as           unlimited
+  - mongod           hard    rss           unlimited
+  - mongod           sort    rss           unlimited
+  - mongod           hard    memlock           unlimited
+  - mongod           sort    memlock           unlimited
+  - mongod           hard    nofile           64000
+  - mongod           sort    nofile           64000
+  - mongod           hard    nproc           64000
+  - mongod           sort    nproc           64000
+  - mongod-mms           hard    nproc           500000
+  - mongod-mms           sort    nproc           200000
 
 data_node_key_file_path: '/data/keyfile/'
 data_node_key_file_name: 'rsmcjc-disk.key'
 
-mongosh_binary_name: 'mongodb-mongosh-2.4.0.x86_64.rpm'
+mongosh_binary_name: 'mongodb-mongosh-2.5.6.x86_64.rpm'

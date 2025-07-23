@@ -16,7 +16,8 @@
   args:
     executable: /usr/bin/expect
   loop:
-    - { src: '{{ cert_path }}{{ cert_name }}', dest: '{{ ca_cert_remote_dest }}{{ ca_cert_remote_pfx_name }}' }
+    - { src: '{{ cert_path }}{{ root_cert_name }}', dest: '{{ ca_cert_remote_dest }}{{ root_cert_name }}' }
+    - { src: '{{ cert_path }}{{ intermediate_cert_name }}', dest: '{{ ca_cert_remote_dest }}{{ intermediate_cert_name }}' }
   register: copy_result
 
 - name: Display the fetch result

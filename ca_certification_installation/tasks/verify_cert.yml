@@ -38,9 +38,9 @@
   debug:
     msg: "Backup PEM file: {{ backup_pem_result }}"
 
-- name: Display newServerCert.pem path
+- name: Display new CA pem path
   debug:
-    msg: "New CA cert: {{ ca_cert_remote_dest }}newCaCert.pem"
+    msg: "New CA cert: {{ ca_cert_remote_dest }}{{ ca_cert_remote_name }}"
 
 - name: Create MongoDB SSL directory if it does not exist
   file:
@@ -52,9 +52,9 @@
   register: create_ssl_dir_result
   changed_when: create_ssl_dir_result.changed
 
-- name: Copy newCaCert.pem to existing SSL cert file
+- name: Copy new CA pem  to existing SSL cert file
   copy:
-    src: '{{ ca_cert_remote_dest }}newCaCert.pem'
+    src: '{{ ca_cert_remote_dest }}{{ ca_cert_remote_name }}'
     dest: '{{ ca_cert_installation_path }}{{ ca_cert_remote_name }}'
     owner: '{{ ca_cert_remote_owner }}'
     group: '{{ ca_cert_remote_group }}'
@@ -80,10 +80,9 @@
   become: true
   command: >
     rm
-    {{ ca_cert_remote_dest }}caCertKey.pem
-    {{ ca_cert_remote_dest }}caCert.pem
-    {{ ca_cert_remote_dest }}newCaCert.pem
-    {{ ca_cert_remote_dest }}{{ ca_cert_remote_pfx_name }}
+    {{ ca_cert_remote_dest }}{{ intermediate_cert_name }}
+    {{ ca_cert_remote_dest }}{{ root_cert_name }}
+    {{ ca_cert_remote_dest }}{{ ca_cert_remote_name }}
   args:
     chdir: '{{ ca_cert_remote_dest }}'
   register: remove_result

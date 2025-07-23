@@ -1,4 +1,7 @@
 ---
+- import_tasks: check_required_package.yml
+  tags: check_required_package
+
 - import_tasks: install_required_package.yml
   tags: install_required_package
 

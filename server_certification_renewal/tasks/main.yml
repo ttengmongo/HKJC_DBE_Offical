@@ -23,7 +23,7 @@
 - name: Trigger data node restart
   import_tasks: trigger_data_node_restart.yml
   tags: trigger_data_node_restart
-  when: "'DATA-NODES' in group_names"
+  when: "'DATA_NODES' in group_names"
 
 - name: Ops Manager app service restart
   import_tasks: ops_manager_app_restart.yml

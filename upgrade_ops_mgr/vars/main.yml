@@ -1,24 +1,3 @@
-binary_path: '/backup/mongodb_installation/binary/'
-binary_name: 'mongodb-mms-7.0.10.500.20240731T2149Z.x86_64.rpm'
-backup_path: '/backup/mongoupgrade2025/opsmgr/'
-
-
-package_info:
-#  "6.0.26":
-#    packages_list:
-#      - mongodb-mms-6.0.26.100.20241029T1714Z.x86_64.rpm
-  "6.0.27":
-    packages_list:
-      - mongodb-mms-6.0.27.500.20250129T1801Z.x86_64.rpm
-#  "7.0.12":
-#    packages_list:
-#      - mongodb-mms-7.0.12.500.20241029T1917Z.x86_64.rpm
-  "7.0.14":
-    packages_list:
-      - mongodb-mms-7.0.14.500.20250121T1020Z.x86_64.rpm
-#  "8.0.2":
-#    packages_list:
-#      - mongodb-mms-8.0.2.500.20241205T1612Z.x86_64.rpm
-  "8.0.4":
-    packages_list:
-      - mongodb-mms-8.0.4.500.20250203T1407Z.x86_64.rpm
+binary_path: '/data/backup/mongodb_installation/binary/'
+binary_name: 'mongodb-mms-8.0.5.500.20250303T1924Z.x86_64.rpm'
+backup_path: '/data/backup/mongoupgrade2025/opsmgr/'

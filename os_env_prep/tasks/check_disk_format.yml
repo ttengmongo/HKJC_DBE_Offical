@@ -1,0 +1,10 @@
+---
+- name: Get mount info for /data
+  command: findmnt -n -o FSTYPE { data_mount_path }}
+  register: data_mount
+  changed_when: false
+
+- name: Fail if /data is not XFS or not mounted
+  fail:
+    msg: "/data is not XFS format or not mounted. Process stopped."
+  when: data_mount.stdout != "xfs" or data_mount.stdout == ""

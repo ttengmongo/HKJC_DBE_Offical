@@ -1,0 +1,38 @@
+---
+- name: Check if the source mongodb tool file exists
+  stat:
+    path: "{{ binary_path }}mongodb-database-tools-suse15-x86_64-{{mongo_tools_version}}.tgz"
+  register: source_file_stat
+
+- name: Copy MongoDB binary to the target directory
+  copy:
+    src: "{{ binary_path }}mongodb-database-tools-suse15-x86_64-{{mongo_tools_version}}.tgz"
+    dest: /opt/mongodb/mms/mongodb-releases/
+    owner: mongodb-mms
+    group: mongodb-mms
+    mode: '0644'
+    remote_src: true
+  register: copy_result
+  changed_when: copy_result.changed
+  when: source_file_stat.stat.exists
+
+- name: Display copy result
+  debug:
+    msg: "Copy result: {{ copy_result }}"
+  when: source_file_stat.stat.exists
+
+
+- name: Check if the destination file exists
+  stat:
+    path: "/opt/mongodb/mms/mongodb-releases/mongodb-database-tools-suse15-x86_64-{{mongo_tools_version}}.tgz"
+  register: destination_file_stat
+
+
+- name: Display destination file existence
+  debug:
+    msg: "Destination file  /opt/mongodb/mms/mongodb-releases/mongodb-database-tools-suse15-x86_64-{{mongo_tools_version}}.tgz exists: {{ destination_file_stat.stat.exists }}"
+
+- name: fail if Display destination file does not exist
+  fail:
+    msg: "Failed to find the destination file /opt/mongodb/mms/mongodb-releases/mongodb-database-tools-suse15-x86_64-{{mongo_tools_version}}.tgz"
+  when: not destination_file_stat.stat.exists

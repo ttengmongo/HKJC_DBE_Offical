@@ -1,0 +1,9 @@
+---
+- import_tasks: extractIds.yml
+  tags: extractIds
+
+- import_tasks: copy_updated_mongodb_tool_binary.yml
+  tags: copy_updated_mongodb_tool_binary
+
+- import_tasks: update_agent_dbtool.yml
+  tags: update_agent_dbtool

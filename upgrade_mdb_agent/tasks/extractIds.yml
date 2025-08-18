@@ -1,0 +1,44 @@
+---
+- name: Fetch software component versions
+  uri:
+    url: "https://{{ ansible_fqdn }}:{{ ops_manager_port }}/api/public/v1.0/softwareComponents/versions"
+    method: GET
+    validate_certs: false
+    return_content: true
+    user: "{{ auth_username }}"
+    password: "{{ auth_password }}"
+    headers:
+      Accept: "application/json"
+  register: software_versions_response
+
+- name: Extract automationVersion and mongoDbToolsVersion
+  set_fact:
+    automation_version: "{{ software_versions_response.json.automationVersion }}"
+    mongo_tools_version: "{{ software_versions_response.json.mongoDbToolsVersion }}"
+
+- name: Display extracted versions
+  debug:
+    msg:
+      - "Automation Version: {{ automation_version }}"
+      - "MongoDB Tools Version: {{ mongo_tools_version }}"
+
+- name: Make API call to fetch groups
+  uri:
+    url: "https://{{ansible_fqdn}}:{{ops_manager_port}}/api/public/v1.0/groups?pretty=true&itemsPerPage=1000"
+    method: GET
+    validate_certs: false
+    return_content: true
+    user: "{{ auth_username }}"
+    password: "{{ auth_password }}"
+    headers:
+      Accept: "application/json"
+    body_format: json
+  register: api_response
+
+- name: Parse id and orgId pairs from API response
+  set_fact:
+    id_orgid_pairs: "{{ api_response.json.results | map(attribute='id') | zip(api_response.json.results | map(attribute='orgId')) | list  }}"
+
+- name: Display the id and orgId pairs
+  debug:
+    msg: "{{ id_orgid_pairs }}"

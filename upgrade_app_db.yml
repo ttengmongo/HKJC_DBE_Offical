@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: ops-mgr-appdb
   gather_facts: true
   roles:
     - role: upgrade_app_db

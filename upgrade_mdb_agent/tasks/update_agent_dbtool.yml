@@ -1,0 +1,24 @@
+---
+- name: Post to the API for each id
+  uri:
+    url: "https://{{ ansible_fqdn }}:{{ ops_manager_port }}/api/public/v1.0/groups/{{ item.0 }}/automationConfig/updateAgentVersions"
+    method: POST
+    validate_certs: false
+    return_content: true
+    user: "{{ auth_username }}"
+    password: "{{ auth_password }}"
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    body: >
+      {
+        "automationAgentVersion": "{{ automation_version }}",
+        "mongoDbToolsVersion": "{{ mongo_tools_version }}"
+      }
+    body_format: json
+  loop: "{{ id_orgid_pairs }}"
+  register: post_results
+
+- name: Display POST results
+  debug:
+    var: post_results

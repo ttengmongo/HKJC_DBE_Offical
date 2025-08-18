@@ -1,0 +1,5 @@
+---
+- hosts: "{{ groups['ops-mgr-application'][0] }}"
+  gather_facts: true
+  roles:
+    - role: upgrade_standalone

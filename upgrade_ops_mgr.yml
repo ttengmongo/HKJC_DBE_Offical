@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: ops-mgr-application
   gather_facts: true
   roles:
     - role: upgrade_ops_mgr

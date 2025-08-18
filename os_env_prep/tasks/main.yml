@@ -1,4 +1,7 @@
 ---
+- import_tasks: check_disk_format.yml
+  tags: check_disk_formatgit s
+
 - import_tasks: check_required_package.yml
   tags: check_required_package
 

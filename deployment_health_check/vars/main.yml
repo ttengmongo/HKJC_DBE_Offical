@@ -7,7 +7,7 @@ blkdbadmin_user: 'dbadmin'
 blkdbadmin_password: 'Dbadmin_001'
 
 data_db_port: 38232
-#data_dbadmin_user: 'ma_mgdb_svc@WIN.BETTING.HKJC.ORG.HK'
+data_dbadmin_user: 'corpdev_mongo_user@CORPDEV.HKJC.COM'
 
 ca_cert_path: '/etc/ssl/mongodb/mongodb_rootCA.pem'
 validation_command: 'db.adminCommand({ ping: 1 })'

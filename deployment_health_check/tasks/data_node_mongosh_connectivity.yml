@@ -24,4 +24,4 @@
 
 - name: Display DataNode version check result
   debug:
-    msg: "AppDB version check result: {{ data_node_version_check.stdout }}"
+    msg: "DataNode DB version check result: {{ data_node_version_check.stdout }}"

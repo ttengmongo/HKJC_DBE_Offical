@@ -9,10 +9,6 @@
   set_fact:
     missing_packages: "{{ rpm_check.results | selectattr('rc', '!=', 0) | map(attribute='item') | list }}"
 
-#- name: Show missing packages
-#  debug:
-#    msg: "Missing packages: {{ missing_packages }}"
-
 - name: Fail if there are missing packages
   fail:
     msg: "Missing packages: {{ missing_packages }}"

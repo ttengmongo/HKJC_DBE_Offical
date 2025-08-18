@@ -66,3 +66,4 @@ data_node_key_file_path: '/data/keyfile/'
 data_node_key_file_name: 'rsmcjc-disk.key'
 
 mongosh_binary_name: 'mongodb-mongosh-2.5.6.x86_64.rpm'
+data_mount_path: '/data'

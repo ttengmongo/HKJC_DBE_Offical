@@ -11,7 +11,7 @@
           .
         end
       )
-      ' /backup/mongodb_installation/binary/automationConfig.json
+      ' "{{ binary_path }}automationConfig.json"
   register: jq_result
   changed_when: false
 

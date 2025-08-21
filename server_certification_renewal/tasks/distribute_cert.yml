@@ -2,7 +2,7 @@
 - name: Extract private key from server cert pfx
   become: true
   command: >
-    openssl pkcs12 -in {{ server_cert_remote_dest }}{{ server_cert_remote_name }} -out serverCertKey.pem -nodes -passin pass:{{ server_cert_pfx_pass }}
+    openssl pkcs12 -in {{ server_cert_remote_dest }}{{ server_cert_remote_name }} -nocerts -out serverCertKey.pem -nodes -passin pass:{{ server_cert_pfx_pass }}
   args:
     chdir: '{{ server_cert_remote_dest }}'
   register: extract_key_result

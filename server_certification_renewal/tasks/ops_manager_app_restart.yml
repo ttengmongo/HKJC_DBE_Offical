@@ -10,7 +10,7 @@
 
 - name: Check if mongodb-mms_status is running
   systemd:
-    name: mongodb-mmsgit
+    name: mongodb-mms
     state: started
   register: mongodb_mms_status
 

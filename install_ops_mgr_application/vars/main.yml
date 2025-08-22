@@ -1,5 +1,5 @@
-install_binary_path: /backup/mongodb_installation/binary
-ops_mgr_application_rpm: mongodb-mms-8.0.3.500.20250109T2333Z.x86_64.rpm
+install_binary_path: /data/backup/mongodb_installation/binary
+ops_mgr_application_rpm: mongodb-mms-8.0.4.500.20250203T1407Z.x86_64.rpm
 
 tmp_mongodb_scp: /tmp/mongodb/scp
 

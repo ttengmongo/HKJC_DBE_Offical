@@ -1,7 +1,7 @@
 ops_mgr_app_port: 8132
 ops_mgr_app_server: "{{ groups['ops-mgr-application'][0] }}"
 
-install_binary_path: /backup/mongodb_installation/binary
+install_binary_path: /data/backup/mongodb_installation/binary
 mms_automation_agent_rpm: mongodb-mms-automation-agent-manager-108.0.3.8758-1.x86_64.rhel7.rpm
 
 automation_agent_config: /etc/mongodb-mms/automation-agent.config

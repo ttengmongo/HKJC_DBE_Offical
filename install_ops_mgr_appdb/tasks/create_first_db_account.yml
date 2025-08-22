@@ -32,7 +32,7 @@
       --eval 'rs.status().members.reduce((a,v) => a + v.state, 0)'
   register: appdb_rs_status
   when: check_first_user.rc != 0
-  failed_when: appdb_rs_status.stdout != appdb_rs_status_success_code
+  until: appdb_rs_status.stdout == appdb_rs_status_success_code
   retries: 3
   delay: 5
 
@@ -49,7 +49,7 @@
       --eval 'rs.status().members.reduce((a,v) => a + v.state, 0)'
   register: appdb_rs_status
   when: check_first_user.rc == 0
-  failed_when: appdb_rs_status.stdout != appdb_rs_status_success_code
+  until: appdb_rs_status.stdout == appdb_rs_status_success_code
   retries: 3
   delay: 5
 

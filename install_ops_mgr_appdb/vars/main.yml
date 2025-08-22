@@ -1,11 +1,11 @@
-install_binary_path: /backup/mongodb_installation/binary
+install_binary_path: /data/backup/mongodb_installation/binary
 tmp_mongodb_scp: /tmp/mongodb/scp
 
 mdb_server_pkg: mongodb-enterprise-server
 mdb_server_version: 8.0.4-1.suse15.x86_64
 
 mdb_mongosh_pkg: mongodb-mongosh
-mdb_mongosh_version: 2.3.9.x86_64
+mdb_mongosh_version: 2.5.6.x86_64
 
 mdb_database_tools_pkg: mongodb-database-tools
 mdb_database_tools_version: suse15-x86_64-100.11.0

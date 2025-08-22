@@ -2,9 +2,9 @@ binary_path: '/data/backup/mongodb_installation/binary/'
 mongodb_binary_name: 'mongodb-enterprise-server-8.0.5-1.suse15.x86_64.rpm'
 mongosh_binary_name: 'mongodb-mongosh-2.5.6.x86_64.rpm'
 
-scp_user: 'jiacy'
-scp_command:  'spawn scp -oStrictHostKeyChecking=no '
-scp_password: '0000abc!'
+scp_user: 'user1'
+scp_password: '111'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no {{scp_user}}@'
 scp_dest_folder: '/data/backup/mongo_config/'
 
 source_host: 'devpostgresql02.corpdev.hkjc.com'
@@ -22,6 +22,6 @@ mongodb_config_path: '/data/appdb/mongod.conf'
 mongodb_db_port: 38132
 mongodb_user: 'dbadmin'
 mongodb_password: 'dbadmin'
-mongodb__connection: 'devpostgresql01.corpdev.hkjc.com:{{ mongodb_db_port }},devpostgresql02.corpdev.hkjc.com:{{ mongodb_db_port }},devpostgresql03.corpdev.hkjc.com:{{ mongodb_db_port }}'
+mongodb_connection: 'devpostgresql01.corpdev.hkjc.com:{{ mongodb_db_port }},devpostgresql02.corpdev.hkjc.com:{{ mongodb_db_port }},devpostgresql03.corpdev.hkjc.com:{{ mongodb_db_port }}'
 mongodb_add_member: 'var cfg = rs.conf(); cfg.members.push({_id: cfg.members.length, host: "{{ ansible_fqdn }}:{{ mongodb_db_port }}", hidden: false, priority: 0}); rs.reconfig(cfg);'
 

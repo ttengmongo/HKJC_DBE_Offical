@@ -3,11 +3,12 @@
 cert_server: 'ec2-3-250-79-119.eu-west-1.compute.amazonaws.com'
 cert_path: '/backup/mongodb_installation/binary/'
 cert_name: 'server.pfx'
-scp_command:  'spawn scp -oStrictHostKeyChecking=no ted@'
-scp_password: 'QWER:1234'
+scp_user: 'user1'
+scp_password: '1111'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no {{scp_user}}@'
 
 # server_cert_vars
-server_cert_remote_dest: '/backup/mongodb_cert/'
+server_cert_remote_dest: '/data/backup/mongodb_cert/'
 server_cert_remote_name: 'newServerCert.pfx'
 server_cert_pfx_pass: '123123'
 server_cert_installation_path: '/etc/ssl/mongodb/'

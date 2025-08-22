@@ -2,14 +2,15 @@
 cert_server: '10.194.139.56'
 cert_path: '/data/backup/mongodb_installation/cert/'
 cert_name: 'mongodbANS.corpdev.hkjc.com.pfx'
-scp_command:  'spawn scp -oStrictHostKeyChecking=no '
-scp_password: '1111'
 server_cert_pfx_pass: '1111'
+scp_user: 'user1'
+scp_password: '1111'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no {{scp_user}}@'
+
 
 # server_cert_vars
-server_cert_remote_dest: '/backup/mongodb_cert/'
+server_cert_remote_dest: '/data/backup/mongodb_cert/'
 server_cert_remote_name: 'newServerCert.pfx'
-
 server_cert_installation_path: '/etc/ssl/mongodb/'
 server_cert_remote_owner: 'mongod'
 server_cert_remote_group: 'mongod'

@@ -1,6 +1,6 @@
 ---
 - name: Get mount info for /data
-  command: findmnt -n -o FSTYPE { data_mount_path }}
+  command: findmnt -n -o FSTYPE {{ data_mount_path }}
   register: data_mount
   changed_when: false
 

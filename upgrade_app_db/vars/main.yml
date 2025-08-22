@@ -2,7 +2,6 @@ binary_path: '/data/backup/mongodb_installation/binary/'
 binary_name: 'mongodb-enterprise-server-8.0.5-1.suse15.x86_64.rpm'
 backup_path: '/data/backup/mongoupgrade2025/appdb/'
 
-app_db_path: '/data/appdb/'
 mongodb_db_port: 38132
 source_ssl_path: '/etc/ssl/mongodb/'
 ca_pem_name: 'mongodb_rootCA.pem'

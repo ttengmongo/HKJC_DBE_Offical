@@ -29,17 +29,3 @@
     dest: '{{ backup_path }}'
     remote_src: yes
     mode: "0644"
-
-#- name: Copy BlockstoreDB directory to backup
-#  copy:
-#    src: /data/blockstore/
-#    dest: '{{ backup_path }}blockstoreBackup'
-#    remote_src: yes
-#    mode: "0644"
-#
-#- name: Copy BlockstoreDB mongod.conf to backup
-#  copy:
-#    src: /data/blockstore/mongod.conf
-#    dest: '{{ backup_path }}blockstoreBackup'
-#    remote_src: yes
-#    mode: "0644"

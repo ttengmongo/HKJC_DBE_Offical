@@ -1,12 +1,13 @@
 # cert_server_vars
-cert_server: 'ip-172-31-33-159.eu-west-1.compute.internal'
-cert_path: '/backup/mongodb_installation/binary/'
+cert_server: '10.194.139.56'
+cert_path: '/data/backup/mongodb_installation/cert/'
 cert_name: 'ldap.pfx'
-scp_command:  'spawn scp -oStrictHostKeyChecking=no jiacy@'
-scp_password: '1234QQQ'
+scp_user: 'user1'
+scp_password: '1111'
+scp_command:  'spawn scp -oStrictHostKeyChecking=no {{scp_user}}@'
 
 # ca_cert_vars
-ca_cert_remote_dest: '/backup/mongodb_cert/'
+ca_cert_remote_dest: '/data/backup/mongodb_installation/cert/'
 ca_cert_remote_pfx_name: 'mongodb_ldap.pfx'
 ca_cert_pfx_pass: '123123'
 ca_cert_remote_owner: 'mongod'

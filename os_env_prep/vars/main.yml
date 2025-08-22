@@ -1,4 +1,4 @@
-binary_path: '/data/backup/mongodb_installation/binary/HKJC_MONGO_OS_LIB/'
+binary_path: '/data/backup/mongodb_installation/binary/'
 required_packages:
   - cyrus-sasl
   - cyrus-sasl-plain
@@ -16,14 +16,9 @@ required_packages:
   - python3-pyudev
   - insserv-compat
   - tuned
-  - jq
 
 dependency_packages:
   - insserv-compat-0.1-4.6.1.noarch.rpm
-  - cyrus-sasl-2.1.28-150600.7.3.1.x86_64.rpm
-  - cyrus-sasl-plain-2.1.28-150600.7.3.1.x86_64.rpm
-  - cyrus-sasl-gssapi-2.1.28-150600.7.3.1.x86_64.rpm
-  - krb5-1.20.1-150600.11.8.1.x86_64.rpm
   - libcurl4-8.6.0-150600.4.21.1.x86_64.rpm
   - libldap-2_4-2-2.4.46-150600.23.21.x86_64.rpm
   - libopenssl1_1-1.1.1w-150600.5.12.2.x86_64.rpm
